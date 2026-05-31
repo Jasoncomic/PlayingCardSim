@@ -22,3 +22,8 @@ Thumbs.db
 
 .plastic/
 .plasticignore
+# .NET build output
+bin/
+obj/
+# Keep blackjack console project file
+!BlackJackBattleTest/BlackJackBattleTest.csproj
