@@ -51,6 +51,14 @@ public class CardDrawer : MonoBehaviour
             );
         }
 
+        CardTextureDisplay textureDisplay =
+            cardObject.GetComponent<CardTextureDisplay>();
+
+        if (textureDisplay != null)
+        {
+            textureDisplay.SetCard(drawnCard);
+        }
+
         Debug.Log("Drew: " + drawnCard);
 
         cardsDrawn++;
