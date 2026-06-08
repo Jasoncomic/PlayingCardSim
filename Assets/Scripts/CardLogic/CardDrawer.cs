@@ -5,49 +5,65 @@ using BlackJackBattleTest;
 public class CardDrawer : MonoBehaviour
 {
     public GameObject cardPrefab;
-
     public Transform deckPosition;
-
     public Transform playerSpawn;
 
-    private Deck deck;
+    private Deck testDeck;
+    private int testCardsDrawn = 0;
+    private int visualCardsSpawned = 0;
 
-    private int cardsDrawn = 0;
-
-    void Start()
+    private void Start()
     {
-        deck = new Deck();
+        testDeck = new Deck();
     }
 
-    void Update()
+    private void Update()
     {
         if (Keyboard.current != null &&
             Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            DrawCard();
+            DrawTestCard();
         }
     }
 
-    public void DrawCard()
+    public void DrawTestCard()
     {
-        Card drawnCard = deck.Draw();
+        Card drawnCard = testDeck.Draw();
+        SpawnCardVisual(drawnCard, playerSpawn, testCardsDrawn);
+        testCardsDrawn++;
 
-        GameObject cardObject =
-            Instantiate(
-                cardPrefab,
-                playerSpawn.position +
-                new Vector3(cardsDrawn * 0.08f, 0, 0),
-                Quaternion.identity
-            );
+        Debug.Log("Test drew: " + drawnCard);
+    }
 
-        CardDisplay display =
-            cardObject.GetComponent<CardDisplay>();
+    public void SpawnCardVisual(Card card, Transform spawnPoint, int cardIndex)
+    {
+        if (cardPrefab == null)
+        {
+            Debug.LogWarning("CardDrawer has no card prefab assigned.");
+            return;
+        }
+
+        if (spawnPoint == null)
+        {
+            Debug.LogWarning("CardDrawer has no spawn point assigned.");
+            return;
+        }
+
+        Vector3 offset = new Vector3(cardIndex * 0.26f, 0.01f, 0f);
+
+        GameObject cardObject = Instantiate(
+            cardPrefab,
+            spawnPoint.position + offset,
+            spawnPoint.rotation
+        );
+
+        CardDisplay display = cardObject.GetComponent<CardDisplay>();
 
         if (display != null)
         {
             display.SetCard(
-                drawnCard.Rank + "\n" +
-                drawnCard.Suit
+                card.Rank + "\n" +
+                card.Suit
             );
         }
 
@@ -56,11 +72,21 @@ public class CardDrawer : MonoBehaviour
 
         if (textureDisplay != null)
         {
-            textureDisplay.SetCard(drawnCard);
+            textureDisplay.SetCard(card);
         }
 
-        Debug.Log("Drew: " + drawnCard);
+        visualCardsSpawned++;
+    }
 
-        cardsDrawn++;
+    public void ClearSpawnedCards()
+    {
+        GameObject[] cards = GameObject.FindGameObjectsWithTag("Card");
+
+        foreach (GameObject card in cards)
+        {
+            Destroy(card);
+        }
+
+        visualCardsSpawned = 0;
     }
 }

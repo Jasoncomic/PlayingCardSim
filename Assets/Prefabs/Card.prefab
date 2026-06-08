@@ -309,7 +309,7 @@ GameObject:
   - component: {fileID: -5155237275407543742}
   m_Layer: 0
   m_Name: Card
-  m_TagString: Untagged
+  m_TagString: Card
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -323,9 +323,9 @@ Transform:
   m_GameObject: {fileID: 4669484858477087792}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.5, y: 0.4347, z: 0.21738}
-  m_LocalScale: {x: 0.063, y: 0.001, z: 0.088}
-  m_ConstrainProportionsScale: 1
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.22, y: 0.015, z: 0.32}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5992427418992998893}
   - {fileID: 5065601788534251748}

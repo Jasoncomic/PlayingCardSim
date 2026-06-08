@@ -10,6 +10,11 @@ public class BlackjackUnityTestController : MonoBehaviour
     [SerializeField] private TMP_Text statusText;
     [SerializeField] private TMP_Text logText;
 
+    [Header("Card Visuals")]
+    [SerializeField] private CardDrawer cardDrawer;
+    [SerializeField] private Transform playerCardSpawn;
+    [SerializeField] private Transform dealerCardSpawn;
+
     [Header("Settings")]
     [SerializeField] private int playerCount = 1;
 
@@ -24,6 +29,7 @@ public class BlackjackUnityTestController : MonoBehaviour
     {
         playerCount = Mathf.Clamp(playerCount, 1, 3);
         game = new BlackjackBattleGame(playerCount);
+
         AddLog("Game created. Press Start Round.");
         RefreshUI();
     }
@@ -38,12 +44,16 @@ public class BlackjackUnityTestController : MonoBehaviour
         }
 
         game.StartNewRound();
+
         currentPlayerIndex = GetNextActivePlayerIndex(0);
         roundActive = true;
         dealerHasPlayed = false;
 
         AddLog("Round " + game.RoundNumber + " started.");
         AddLog("Dealer shows: " + game.Dealer.Hand.Cards[0]);
+
+        SpawnRoundCards();
+
         RefreshUI();
     }
 
@@ -60,6 +70,8 @@ public class BlackjackUnityTestController : MonoBehaviour
         Card drawnCard = game.PlayerHit(currentPlayerIndex);
 
         AddLog(player.Name + " drew " + drawnCard + ".");
+
+        SpawnPlayerCard(drawnCard, player.Hand.Cards.Count - 1);
 
         if (player.HasBustedThisRound)
         {
@@ -83,6 +95,7 @@ public class BlackjackUnityTestController : MonoBehaviour
         game.PlayerStand(currentPlayerIndex);
 
         AddLog(player.Name + " stands with " + player.Hand.Value + ".");
+
         MoveToNextPlayer();
         RefreshUI();
     }
@@ -105,9 +118,14 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         if (!dealerHasPlayed)
         {
+            int oldDealerCardCount = game.Dealer.Hand.Cards.Count;
+
             game.PlayDealerTurn();
             dealerHasPlayed = true;
+
             AddLog("Dealer played. Dealer value: " + game.Dealer.Hand.Value);
+
+            SpawnNewDealerCards(oldDealerCardCount);
         }
 
         List<string> results = game.ResolveRound();
@@ -133,6 +151,69 @@ public class BlackjackUnityTestController : MonoBehaviour
         }
 
         RefreshUI();
+    }
+
+    private void SpawnRoundCards()
+    {
+        if (cardDrawer == null)
+        {
+            AddLog("No CardDrawer assigned. Skipping card visuals.");
+            return;
+        }
+
+        cardDrawer.ClearSpawnedCards();
+
+        if (playerCardSpawn == null)
+        {
+            AddLog("No PlayerCardSpawn assigned.");
+        }
+
+        if (dealerCardSpawn == null)
+        {
+            AddLog("No DealerCardSpawn assigned.");
+        }
+
+        // For now we only show Player 1 visually.
+        // Later, for multiplayer, we can add spawn points for Player 2 and Player 3.
+        BlackjackPlayer player = game.Players[0];
+
+        for (int i = 0; i < player.Hand.Cards.Count; i++)
+        {
+            SpawnPlayerCard(player.Hand.Cards[i], i);
+        }
+
+        for (int i = 0; i < game.Dealer.Hand.Cards.Count; i++)
+        {
+            SpawnDealerCard(game.Dealer.Hand.Cards[i], i);
+        }
+    }
+
+    private void SpawnPlayerCard(Card card, int cardIndex)
+    {
+        if (cardDrawer == null || playerCardSpawn == null)
+        {
+            return;
+        }
+
+        cardDrawer.SpawnCardVisual(card, playerCardSpawn, cardIndex);
+    }
+
+    private void SpawnDealerCard(Card card, int cardIndex)
+    {
+        if (cardDrawer == null || dealerCardSpawn == null)
+        {
+            return;
+        }
+
+        cardDrawer.SpawnCardVisual(card, dealerCardSpawn, cardIndex);
+    }
+
+    private void SpawnNewDealerCards(int oldDealerCardCount)
+    {
+        for (int i = oldDealerCardCount; i < game.Dealer.Hand.Cards.Count; i++)
+        {
+            SpawnDealerCard(game.Dealer.Hand.Cards[i], i);
+        }
     }
 
     private bool CanCurrentPlayerAct()
