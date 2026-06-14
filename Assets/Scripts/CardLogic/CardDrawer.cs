@@ -1,16 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using BlackJackBattleTest;
 
 public class CardDrawer : MonoBehaviour
 {
+    [Header("Card Setup")]
     public GameObject cardPrefab;
     public Transform deckPosition;
     public Transform playerSpawn;
 
     private Deck testDeck;
     private int testCardsDrawn = 0;
-    private int visualCardsSpawned = 0;
+
+    private readonly List<GameObject> spawnedCards = new List<GameObject>();
 
     private void Start()
     {
@@ -28,6 +31,11 @@ public class CardDrawer : MonoBehaviour
 
     public void DrawTestCard()
     {
+        if (testDeck == null)
+        {
+            testDeck = new Deck();
+        }
+
         Card drawnCard = testDeck.Draw();
         SpawnCardVisual(drawnCard, playerSpawn, testCardsDrawn);
         testCardsDrawn++;
@@ -57,7 +65,7 @@ public class CardDrawer : MonoBehaviour
             spawnPoint.rotation
         );
 
-        cardObject.tag = "Card";
+        spawnedCards.Add(cardObject);
 
         CardDisplay display = cardObject.GetComponent<CardDisplay>();
 
@@ -76,20 +84,19 @@ public class CardDrawer : MonoBehaviour
         {
             textureDisplay.SetCard(card);
         }
-
-        visualCardsSpawned++;
     }
 
     public void ClearSpawnedCards()
     {
-        GameObject[] cards = GameObject.FindGameObjectsWithTag("Card");
-
-        foreach (GameObject card in cards)
+        for (int i = spawnedCards.Count - 1; i >= 0; i--)
         {
-            Destroy(card);
+            if (spawnedCards[i] != null)
+            {
+                Destroy(spawnedCards[i]);
+            }
         }
 
-        visualCardsSpawned = 0;
+        spawnedCards.Clear();
         testCardsDrawn = 0;
     }
 }

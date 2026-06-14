@@ -19,7 +19,7 @@ public class BlackjackUnityTestController : MonoBehaviour
     [SerializeField] private int playerCount = 1;
 
     private BlackjackBattleGame game;
-    private int currentPlayerIndex;
+    private int currentPlayerIndex = -1;
     private bool roundActive;
     private bool dealerHasPlayed;
 
@@ -27,6 +27,8 @@ public class BlackjackUnityTestController : MonoBehaviour
 
     private void Start()
     {
+        SetupReferences();
+
         playerCount = Mathf.Clamp(playerCount, 1, 3);
         game = new BlackjackBattleGame(playerCount);
 
@@ -34,11 +36,62 @@ public class BlackjackUnityTestController : MonoBehaviour
         RefreshUI();
     }
 
+    private void SetupReferences()
+    {
+        // Always refresh CardDrawer reference.
+        // This helps if Unity loses the reference after card objects are cleared.
+        CardDrawer foundDrawer = FindFirstObjectByType<CardDrawer>();
+
+        if (foundDrawer != null)
+        {
+            cardDrawer = foundDrawer;
+        }
+        else
+        {
+            Debug.LogWarning("No CardDrawer found in the scene.");
+        }
+
+        if (playerCardSpawn == null)
+        {
+            GameObject playerSpawnObject = GameObject.Find("PlayerCardSpawn");
+
+            if (playerSpawnObject != null)
+            {
+                playerCardSpawn = playerSpawnObject.transform;
+            }
+            else
+            {
+                Debug.LogWarning("PlayerCardSpawn was not found.");
+            }
+        }
+
+        if (dealerCardSpawn == null)
+        {
+            GameObject dealerSpawnObject = GameObject.Find("DealerCardSpawn");
+
+            if (dealerSpawnObject != null)
+            {
+                dealerCardSpawn = dealerSpawnObject.transform;
+            }
+            else
+            {
+                Debug.LogWarning("DealerCardSpawn was not found.");
+            }
+        }
+    }
+
     public void StartRound()
     {
+        SetupReferences();
+
+        if (game == null)
+        {
+            game = new BlackjackBattleGame(playerCount);
+        }
+
         if (game.PlayersHaveWon() || game.DealerHasWon())
         {
-            AddLog("Game is already over. Restart Play Mode to test again.");
+            AddLog("Game is already over. Press New Game.");
             RefreshUI();
             return;
         }
@@ -50,15 +103,20 @@ public class BlackjackUnityTestController : MonoBehaviour
         dealerHasPlayed = false;
 
         AddLog("Round " + game.RoundNumber + " started.");
-        AddLog("Dealer shows: " + game.Dealer.Hand.Cards[0]);
 
-        SpawnRoundCards();
+        if (game.Dealer.Hand.Cards.Count > 0)
+        {
+            AddLog("Dealer shows: " + game.Dealer.Hand.Cards[0]);
+        }
 
+        RedrawAllCards();
         RefreshUI();
     }
 
     public void Hit()
     {
+        SetupReferences();
+
         if (!CanCurrentPlayerAct())
         {
             AddLog("No player can hit right now.");
@@ -71,7 +129,8 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         AddLog(player.Name + " drew " + drawnCard + ".");
 
-        SpawnPlayerCard(drawnCard, player.Hand.Cards.Count - 1);
+        // Redraw the full table so the visual state always matches the real game state.
+        RedrawAllCards();
 
         if (player.HasBustedThisRound)
         {
@@ -84,6 +143,8 @@ public class BlackjackUnityTestController : MonoBehaviour
 
     public void Stand()
     {
+        SetupReferences();
+
         if (!CanCurrentPlayerAct())
         {
             AddLog("No player can stand right now.");
@@ -97,11 +158,15 @@ public class BlackjackUnityTestController : MonoBehaviour
         AddLog(player.Name + " stands with " + player.Hand.Value + ".");
 
         MoveToNextPlayer();
+
+        RedrawAllCards();
         RefreshUI();
     }
 
     public void DealerTurnAndResolve()
     {
+        SetupReferences();
+
         if (!roundActive)
         {
             AddLog("Start a round first.");
@@ -118,14 +183,12 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         if (!dealerHasPlayed)
         {
-            int oldDealerCardCount = game.Dealer.Hand.Cards.Count;
-
             game.PlayDealerTurn();
             dealerHasPlayed = true;
 
             AddLog("Dealer played. Dealer value: " + game.Dealer.Hand.Value);
 
-            SpawnNewDealerCards(oldDealerCardCount);
+            RedrawAllCards();
         }
 
         List<string> results = game.ResolveRound();
@@ -150,75 +213,63 @@ public class BlackjackUnityTestController : MonoBehaviour
             AddLog("Round finished. Press Start Round again.");
         }
 
+        RedrawAllCards();
         RefreshUI();
     }
 
-    private void SpawnRoundCards()
+    private void RedrawAllCards()
     {
+        SetupReferences();
+
         if (cardDrawer == null)
         {
             AddLog("No CardDrawer assigned. Skipping card visuals.");
+            Debug.LogWarning("Cannot draw cards because CardDrawer is missing.");
+            return;
+        }
+
+        if (game == null)
+        {
             return;
         }
 
         cardDrawer.ClearSpawnedCards();
 
-        if (playerCardSpawn == null)
+        if (playerCardSpawn != null && game.Players.Count > 0)
         {
-            AddLog("No PlayerCardSpawn assigned.");
+            BlackjackPlayer player = game.Players[0];
+
+            for (int i = 0; i < player.Hand.Cards.Count; i++)
+            {
+                cardDrawer.SpawnCardVisual(player.Hand.Cards[i], playerCardSpawn, i);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Cannot draw player cards because PlayerCardSpawn is missing.");
         }
 
-        if (dealerCardSpawn == null)
+        if (dealerCardSpawn != null)
         {
-            AddLog("No DealerCardSpawn assigned.");
+            for (int i = 0; i < game.Dealer.Hand.Cards.Count; i++)
+            {
+                cardDrawer.SpawnCardVisual(game.Dealer.Hand.Cards[i], dealerCardSpawn, i);
+            }
         }
-
-        // For now we only show Player 1 visually.
-        // Later, for multiplayer, we can add spawn points for Player 2 and Player 3.
-        BlackjackPlayer player = game.Players[0];
-
-        for (int i = 0; i < player.Hand.Cards.Count; i++)
+        else
         {
-            SpawnPlayerCard(player.Hand.Cards[i], i);
-        }
-
-        for (int i = 0; i < game.Dealer.Hand.Cards.Count; i++)
-        {
-            SpawnDealerCard(game.Dealer.Hand.Cards[i], i);
-        }
-    }
-
-    private void SpawnPlayerCard(Card card, int cardIndex)
-    {
-        if (cardDrawer == null || playerCardSpawn == null)
-        {
-            return;
-        }
-
-        cardDrawer.SpawnCardVisual(card, playerCardSpawn, cardIndex);
-    }
-
-    private void SpawnDealerCard(Card card, int cardIndex)
-    {
-        if (cardDrawer == null || dealerCardSpawn == null)
-        {
-            return;
-        }
-
-        cardDrawer.SpawnCardVisual(card, dealerCardSpawn, cardIndex);
-    }
-
-    private void SpawnNewDealerCards(int oldDealerCardCount)
-    {
-        for (int i = oldDealerCardCount; i < game.Dealer.Hand.Cards.Count; i++)
-        {
-            SpawnDealerCard(game.Dealer.Hand.Cards[i], i);
+            Debug.LogWarning("Cannot draw dealer cards because DealerCardSpawn is missing.");
         }
     }
 
     private bool CanCurrentPlayerAct()
     {
         if (!roundActive)
+        {
+            return false;
+        }
+
+        if (game == null)
         {
             return false;
         }
@@ -248,6 +299,11 @@ public class BlackjackUnityTestController : MonoBehaviour
 
     private int GetNextActivePlayerIndex(int startIndex)
     {
+        if (game == null)
+        {
+            return -1;
+        }
+
         for (int i = startIndex; i < game.Players.Count; i++)
         {
             if (game.Players[i].IsActiveThisRound)
@@ -314,6 +370,8 @@ public class BlackjackUnityTestController : MonoBehaviour
 
     public void RestartGame()
     {
+        SetupReferences();
+
         playerCount = Mathf.Clamp(playerCount, 1, 3);
 
         game = new BlackjackBattleGame(playerCount);
@@ -334,6 +392,8 @@ public class BlackjackUnityTestController : MonoBehaviour
 
     public void StopCurrentGame()
     {
+        SetupReferences();
+
         currentPlayerIndex = -1;
         roundActive = false;
         dealerHasPlayed = false;
