@@ -311,4 +311,42 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         return builder.ToString();
     }
+
+    public void RestartGame()
+    {
+        playerCount = Mathf.Clamp(playerCount, 1, 3);
+
+        game = new BlackjackBattleGame(playerCount);
+        currentPlayerIndex = -1;
+        roundActive = false;
+        dealerHasPlayed = false;
+
+        logLines.Clear();
+
+        if (cardDrawer != null)
+        {
+            cardDrawer.ClearSpawnedCards();
+        }
+
+        AddLog("New game created. Press Start Round.");
+        RefreshUI();
+    }
+
+    public void StopCurrentGame()
+    {
+        currentPlayerIndex = -1;
+        roundActive = false;
+        dealerHasPlayed = false;
+
+        if (cardDrawer != null)
+        {
+            cardDrawer.ClearSpawnedCards();
+        }
+
+        game = new BlackjackBattleGame(playerCount);
+
+        logLines.Clear();
+        AddLog("Game stopped.");
+        RefreshUI();
+    }
 }

@@ -57,6 +57,8 @@ public class CardDrawer : MonoBehaviour
             spawnPoint.rotation
         );
 
+        cardObject.tag = "Card";
+
         CardDisplay display = cardObject.GetComponent<CardDisplay>();
 
         if (display != null)
@@ -88,5 +90,6 @@ public class CardDrawer : MonoBehaviour
         }
 
         visualCardsSpawned = 0;
+        testCardsDrawn = 0;
     }
 }
