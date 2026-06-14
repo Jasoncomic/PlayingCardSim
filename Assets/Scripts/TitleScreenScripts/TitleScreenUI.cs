@@ -21,11 +21,34 @@ public class TitleScreenUI : MonoBehaviour
     [Header("Settings")]
     public TMP_Text musicToggleText;
 
+    [Header("Blackjack")]
+    public BlackjackUnityTestController blackjackController;
+
     private int selectedPlayerCount = 2;
     private bool musicEnabled = true;
 
+    private void Start()
+    {
+        FindBlackjackControllerIfMissing();
+    }
+
+    private void FindBlackjackControllerIfMissing()
+    {
+        if (blackjackController == null)
+        {
+            blackjackController = FindFirstObjectByType<BlackjackUnityTestController>();
+        }
+
+        if (blackjackController == null)
+        {
+            Debug.LogWarning("BlackjackUnityTestController was not found in the scene.");
+        }
+    }
+
     public void QuickStart()
     {
+        FindBlackjackControllerIfMissing();
+
         titleScreenPanel.SetActive(false);
         gameUIPanel.SetActive(true);
 
@@ -38,7 +61,13 @@ public class TitleScreenUI : MonoBehaviour
         if (settingsPopup != null)
             settingsPopup.SetActive(false);
 
-        Debug.Log("Quick Start started.");
+        if (blackjackController != null)
+        {
+            blackjackController.SetPlayerCount(1);
+            blackjackController.RestartGame();
+        }
+
+        Debug.Log("Quick Start started with 1 player.");
     }
 
     public void ShowCreateGame()
@@ -72,6 +101,8 @@ public class TitleScreenUI : MonoBehaviour
 
     public void CreateLobby()
     {
+        FindBlackjackControllerIfMissing();
+
         Debug.Log("Create game with players: " + selectedPlayerCount);
 
         if (createGamePopup != null)
@@ -80,7 +111,15 @@ public class TitleScreenUI : MonoBehaviour
         titleScreenPanel.SetActive(false);
         gameUIPanel.SetActive(true);
 
-        // Later: start host / create lobby here.
+        if (blackjackController != null)
+        {
+            blackjackController.SetPlayerCount(selectedPlayerCount);
+            blackjackController.RestartGame();
+        }
+        else
+        {
+            Debug.LogError("Cannot create lobby because BlackjackUnityTestController is missing.");
+        }
     }
 
     public void ShowJoinGame()
@@ -103,6 +142,8 @@ public class TitleScreenUI : MonoBehaviour
 
     public void JoinGame()
     {
+        FindBlackjackControllerIfMissing();
+
         string gameCode = "";
 
         if (gameCodeInputField != null)
@@ -116,7 +157,13 @@ public class TitleScreenUI : MonoBehaviour
         titleScreenPanel.SetActive(false);
         gameUIPanel.SetActive(true);
 
-        // Later: connect to host / lobby here.
+        // For prototype: joining starts a local 1-player game.
+        // Real network joining can be implemented later.
+        if (blackjackController != null)
+        {
+            blackjackController.SetPlayerCount(1);
+            blackjackController.RestartGame();
+        }
     }
 
     public void ShowSettings()
@@ -147,8 +194,6 @@ public class TitleScreenUI : MonoBehaviour
         }
 
         Debug.Log("Music enabled: " + musicEnabled);
-
-        // Later: connect this to real background music.
     }
 
     public void BackToTitleMenu()

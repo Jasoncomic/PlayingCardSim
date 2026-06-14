@@ -32,14 +32,12 @@ public class BlackjackUnityTestController : MonoBehaviour
         playerCount = Mathf.Clamp(playerCount, 1, 3);
         game = new BlackjackBattleGame(playerCount);
 
-        AddLog("Game created. Press Start Round.");
+        AddLog("Game created with " + playerCount + " player(s). Press Start Round.");
         RefreshUI();
     }
 
     private void SetupReferences()
     {
-        // Always refresh CardDrawer reference.
-        // This helps if Unity loses the reference after card objects are cleared.
         CardDrawer foundDrawer = FindFirstObjectByType<CardDrawer>();
 
         if (foundDrawer != null)
@@ -80,6 +78,17 @@ public class BlackjackUnityTestController : MonoBehaviour
         }
     }
 
+    public void SetPlayerCount(int count)
+    {
+        playerCount = Mathf.Clamp(count, 1, 3);
+        Debug.Log("Blackjack player count set to: " + playerCount);
+    }
+
+    public void CreateGame()
+    {
+        RestartGame();
+    }
+
     public void StartRound()
     {
         SetupReferences();
@@ -109,6 +118,11 @@ public class BlackjackUnityTestController : MonoBehaviour
             AddLog("Dealer shows: " + game.Dealer.Hand.Cards[0]);
         }
 
+        if (currentPlayerIndex != -1)
+        {
+            AddLog("Now it is " + game.Players[currentPlayerIndex].Name + "'s turn.");
+        }
+
         RedrawAllCards();
         RefreshUI();
     }
@@ -129,7 +143,6 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         AddLog(player.Name + " drew " + drawnCard + ".");
 
-        // Redraw the full table so the visual state always matches the real game state.
         RedrawAllCards();
 
         if (player.HasBustedThisRound)
@@ -138,6 +151,7 @@ public class BlackjackUnityTestController : MonoBehaviour
             MoveToNextPlayer();
         }
 
+        RedrawAllCards();
         RefreshUI();
     }
 
@@ -199,6 +213,7 @@ public class BlackjackUnityTestController : MonoBehaviour
         }
 
         roundActive = false;
+        currentPlayerIndex = -1;
 
         if (game.PlayersHaveWon())
         {
@@ -235,30 +250,49 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         cardDrawer.ClearSpawnedCards();
 
-        if (playerCardSpawn != null && game.Players.Count > 0)
-        {
-            BlackjackPlayer player = game.Players[0];
+        DrawCurrentPlayerCards();
+        DrawDealerCards();
+    }
 
-            for (int i = 0; i < player.Hand.Cards.Count; i++)
-            {
-                cardDrawer.SpawnCardVisual(player.Hand.Cards[i], playerCardSpawn, i);
-            }
-        }
-        else
+    private void DrawCurrentPlayerCards()
+    {
+        if (playerCardSpawn == null)
         {
             Debug.LogWarning("Cannot draw player cards because PlayerCardSpawn is missing.");
+            return;
         }
 
-        if (dealerCardSpawn != null)
+        if (game.Players.Count == 0)
         {
-            for (int i = 0; i < game.Dealer.Hand.Cards.Count; i++)
-            {
-                cardDrawer.SpawnCardVisual(game.Dealer.Hand.Cards[i], dealerCardSpawn, i);
-            }
+            return;
         }
-        else
+
+        int playerIndexToDraw = currentPlayerIndex;
+
+        if (playerIndexToDraw < 0 || playerIndexToDraw >= game.Players.Count)
+        {
+            playerIndexToDraw = 0;
+        }
+
+        BlackjackPlayer player = game.Players[playerIndexToDraw];
+
+        for (int i = 0; i < player.Hand.Cards.Count; i++)
+        {
+            cardDrawer.SpawnCardVisual(player.Hand.Cards[i], playerCardSpawn, i);
+        }
+    }
+
+    private void DrawDealerCards()
+    {
+        if (dealerCardSpawn == null)
         {
             Debug.LogWarning("Cannot draw dealer cards because DealerCardSpawn is missing.");
+            return;
+        }
+
+        for (int i = 0; i < game.Dealer.Hand.Cards.Count; i++)
+        {
+            cardDrawer.SpawnCardVisual(game.Dealer.Hand.Cards[i], dealerCardSpawn, i);
         }
     }
 
@@ -347,10 +381,22 @@ public class BlackjackUnityTestController : MonoBehaviour
 
         StringBuilder builder = new StringBuilder();
 
+        builder.AppendLine("Players: " + game.Players.Count);
         builder.AppendLine("Round: " + game.RoundNumber);
         builder.AppendLine("Dealer HP: " + game.Dealer.Hp + "/" + game.Dealer.MaxHp);
         builder.AppendLine("Dealer Hand: " + game.Dealer.Hand + " | Value: " + game.Dealer.Hand.Value);
         builder.AppendLine();
+
+        if (roundActive && currentPlayerIndex >= 0 && currentPlayerIndex < game.Players.Count)
+        {
+            builder.AppendLine("Current Turn: " + game.Players[currentPlayerIndex].Name);
+            builder.AppendLine();
+        }
+        else if (roundActive)
+        {
+            builder.AppendLine("Current Turn: Dealer / Resolve");
+            builder.AppendLine();
+        }
 
         for (int i = 0; i < game.Players.Count; i++)
         {
@@ -386,7 +432,7 @@ public class BlackjackUnityTestController : MonoBehaviour
             cardDrawer.ClearSpawnedCards();
         }
 
-        AddLog("New game created. Press Start Round.");
+        AddLog("New game created with " + playerCount + " player(s). Press Start Round.");
         RefreshUI();
     }
 

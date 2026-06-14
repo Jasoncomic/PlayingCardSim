@@ -43,7 +43,25 @@ namespace BlackJackBattleTest
                 playerCount = 1;
             }
 
-            return 6 + ((playerCount - 1) * 4);
+            if (playerCount > 3)
+            {
+                playerCount = 3;
+            }
+
+            switch (playerCount)
+            {
+                case 1:
+                    return 6;
+
+                case 2:
+                    return 9;
+
+                case 3:
+                    return 12;
+
+                default:
+                    return 6;
+            }
         }
 
         public void StartNewRound()
