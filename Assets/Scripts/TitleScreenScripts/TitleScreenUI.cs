@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class TitleScreenUI : MonoBehaviour
 {
@@ -20,9 +21,15 @@ public class TitleScreenUI : MonoBehaviour
 
     [Header("Settings")]
     public TMP_Text musicToggleText;
+    public Slider musicVolumeSlider;
+    public Slider sfxVolumeSlider;
 
     [Header("Blackjack")]
     public BlackjackUnityTestController blackjackController;
+
+    private const string MusicEnabledKey = "MusicEnabled";
+    private const string MusicVolumeKey = "MusicVolume";
+    private const string SfxVolumeKey = "SFXVolume";
 
     private int selectedPlayerCount = 2;
     private bool musicEnabled = true;
@@ -30,6 +37,7 @@ public class TitleScreenUI : MonoBehaviour
     private void Start()
     {
         FindBlackjackControllerIfMissing();
+        LoadAudioSettings();
     }
 
     private void FindBlackjackControllerIfMissing()
@@ -43,6 +51,28 @@ public class TitleScreenUI : MonoBehaviour
         {
             Debug.LogWarning("BlackjackUnityTestController was not found in the scene.");
         }
+    }
+
+    private void LoadAudioSettings()
+    {
+        musicEnabled = PlayerPrefs.GetInt(MusicEnabledKey, 1) == 1;
+
+        float musicVolume = PlayerPrefs.GetFloat(MusicVolumeKey, 0.35f);
+        float sfxVolume = PlayerPrefs.GetFloat(SfxVolumeKey, 0.75f);
+
+        if (musicVolumeSlider != null)
+        {
+            musicVolumeSlider.SetValueWithoutNotify(musicVolume);
+            musicVolumeSlider.onValueChanged.AddListener(SetMusicVolume);
+        }
+
+        if (sfxVolumeSlider != null)
+        {
+            sfxVolumeSlider.SetValueWithoutNotify(sfxVolume);
+            sfxVolumeSlider.onValueChanged.AddListener(SetSfxVolume);
+        }
+
+        ApplyMusicSettings();
     }
 
     public void QuickStart()
@@ -157,8 +187,6 @@ public class TitleScreenUI : MonoBehaviour
         titleScreenPanel.SetActive(false);
         gameUIPanel.SetActive(true);
 
-        // For prototype: joining starts a local 1-player game.
-        // Real network joining can be implemented later.
         if (blackjackController != null)
         {
             blackjackController.SetPlayerCount(1);
@@ -188,12 +216,50 @@ public class TitleScreenUI : MonoBehaviour
     {
         musicEnabled = !musicEnabled;
 
+        PlayerPrefs.SetInt(MusicEnabledKey, musicEnabled ? 1 : 0);
+        PlayerPrefs.Save();
+
+        ApplyMusicSettings();
+
+        Debug.Log("Music enabled: " + musicEnabled);
+    }
+
+    public void SetMusicVolume(float volume)
+    {
+        PlayerPrefs.SetFloat(MusicVolumeKey, volume);
+        PlayerPrefs.Save();
+
+        ApplyMusicSettings();
+    }
+
+    public void SetSfxVolume(float volume)
+    {
+        PlayerPrefs.SetFloat(SfxVolumeKey, volume);
+        PlayerPrefs.Save();
+
+        // For now this only saves the value.
+        // Later, when we add button/card sounds, they can read this value.
+        Debug.Log("SFX volume saved: " + volume);
+    }
+
+    private void ApplyMusicSettings()
+    {
+        float musicVolume = PlayerPrefs.GetFloat(MusicVolumeKey, 0.35f);
+        float targetVolume = musicEnabled ? musicVolume : 0f;
+
+        if (MusicManager.Instance != null)
+        {
+            MusicManager.Instance.SetVolume(targetVolume);
+        }
+        else
+        {
+            Debug.LogWarning("MusicManager not found. Add a MusicManager object to the scene and assign your MP3 clip.");
+        }
+
         if (musicToggleText != null)
         {
             musicToggleText.text = musicEnabled ? "MUSIC: ON" : "MUSIC: OFF";
         }
-
-        Debug.Log("Music enabled: " + musicEnabled);
     }
 
     public void BackToTitleMenu()
