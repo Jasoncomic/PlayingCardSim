@@ -1,37 +1,36 @@
 using UnityEngine;
 
-
 public class GameUIManager : MonoBehaviour
 {
     public GameObject gameUIPanel;
     public GameObject settingsPanel;
     public GameObject titleScreenPanel;
+    public GameObject buttonContainer;
+
+    public BlackjackUnityTestController blackjackController;
 
     public void OpenSettings()
     {
-        settingsPanel.SetActive(true);
+        if (settingsPanel != null)
+            settingsPanel.SetActive(true);
     }
 
     public void CloseSettings()
     {
-        settingsPanel.SetActive(false);
+        if (settingsPanel != null)
+            settingsPanel.SetActive(false);
     }
-
-    //public void BackToTitleScreen()
-    //{
-    //    gameUIPanel.SetActive(false);
-    //    settingsPanel.SetActive(false);
-    //    titleScreenPanel.SetActive(true);
-    //}
 
     public void QuitGame()
     {
         Debug.Log("Quit Game");
 
-        Application.Quit();
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #else
+    Application.Quit();
+    #endif
     }
-
-    public BlackjackUnityTestController blackjackController;
 
     public void BackToTitleScreen()
     {
@@ -40,8 +39,16 @@ public class GameUIManager : MonoBehaviour
             blackjackController.StopCurrentGame();
         }
 
-        gameUIPanel.SetActive(false);
-        settingsPanel.SetActive(false);
-        titleScreenPanel.SetActive(true);
+        if (gameUIPanel != null)
+            gameUIPanel.SetActive(false);
+
+        if (settingsPanel != null)
+            settingsPanel.SetActive(false);
+
+        if (titleScreenPanel != null)
+            titleScreenPanel.SetActive(true);
+
+        if (buttonContainer != null)
+            buttonContainer.SetActive(true);
     }
 }

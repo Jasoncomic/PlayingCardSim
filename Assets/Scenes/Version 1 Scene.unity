@@ -12608,6 +12608,7 @@ MonoBehaviour:
   gameUIPanel: {fileID: 1915278723}
   settingsPanel: {fileID: 1691764616}
   titleScreenPanel: {fileID: 999745621}
+  buttonContainer: {fileID: 204215132}
   blackjackController: {fileID: 1790992538}
 --- !u!1001 &1919591818
 PrefabInstance:
