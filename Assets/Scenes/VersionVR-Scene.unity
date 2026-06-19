@@ -347,7 +347,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &55410861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7503,7 +7503,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &856590783
 Transform:
   m_ObjectHideFlags: 0
@@ -9102,6 +9102,7 @@ MonoBehaviour:
   statusText: {fileID: 1164673498}
   defaultHostIp: 192.168.0.130
   port: 7777
+  selectedPlayerCount: 2
 --- !u!4 &1151038786
 Transform:
   m_ObjectHideFlags: 0
@@ -10126,6 +10127,7 @@ MonoBehaviour:
   playerThreeSpawn: {fileID: 1592662429}
   dealerSpawn: {fileID: 1552127001}
   statusText: {fileID: 1164673498}
+  configuredPlayerCount: 3
 --- !u!1 &1279638635
 GameObject:
   m_ObjectHideFlags: 0
@@ -11643,7 +11645,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1415458302
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,8 +16,12 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
     public TMP_Text statusText;
 
     [Header("Connection")]
-    public string defaultHostIp = "192.168.0.130";
+    public string defaultHostIp = "192.168.0.220";
     public ushort port = 7777;
+
+    [Header("Game Setup")]
+    [Range(1, 3)]
+    public int selectedPlayerCount = 2;
 
     private bool callbacksRegistered;
 
@@ -29,14 +33,7 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         }
 
         RegisterCallbacks();
-
-        SetStatus(
-            "Standalone Quest Mode\n" +
-            "Before connect:\n" +
-            "A = Host\n" +
-            "B = Join " + defaultHostIp + "\n\n" +
-            "This Device IP: " + GetLocalIPv4()
-        );
+        ShowPreConnectionMenu();
     }
 
     private void OnDestroy()
@@ -55,7 +52,7 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
 
         if (!networkRunning)
         {
-            HandleConnectionInput();
+            HandleMenuInput();
         }
         else
         {
@@ -63,15 +60,41 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         }
     }
 
-    private void HandleConnectionInput()
+    private void HandleMenuInput()
     {
-        // Right controller A = Start Host
+        // Left controller X = player count down
+        if (OVRInput.GetDown(OVRInput.RawButton.X))
+        {
+            selectedPlayerCount--;
+
+            if (selectedPlayerCount < 1)
+            {
+                selectedPlayerCount = 1;
+            }
+
+            ShowPreConnectionMenu();
+        }
+
+        // Left controller Y = player count up
+        if (OVRInput.GetDown(OVRInput.RawButton.Y))
+        {
+            selectedPlayerCount++;
+
+            if (selectedPlayerCount > 3)
+            {
+                selectedPlayerCount = 3;
+            }
+
+            ShowPreConnectionMenu();
+        }
+
+        // Right controller A = Create Game / Host
         if (OVRInput.GetDown(OVRInput.RawButton.A))
         {
             StartQuestHost();
         }
 
-        // Right controller B = Join Host
+        // Right controller B = Join Game / Client
         if (OVRInput.GetDown(OVRInput.RawButton.B))
         {
             JoinQuestHost();
@@ -105,6 +128,20 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         }
     }
 
+    private void ShowPreConnectionMenu()
+    {
+        SetStatus(
+            "QUEST STANDALONE MENU\n\n" +
+            "Selected Players: " + selectedPlayerCount + "\n\n" +
+            "X = Less players\n" +
+            "Y = More players\n\n" +
+            "A = Create Game / Host\n" +
+            "B = Join Game\n\n" +
+            "Join IP: " + defaultHostIp + "\n" +
+            "This Device IP: " + GetLocalIPv4()
+        );
+    }
+
     public void StartQuestHost()
     {
         if (NetworkManager.Singleton == null)
@@ -119,11 +156,19 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
             return;
         }
 
+        if (networkBlackjackTable == null)
+        {
+            SetStatus("NetworkBlackjackTable missing.");
+            return;
+        }
+
         if (NetworkManager.Singleton.IsListening)
         {
             SetStatus("Network already running.");
             return;
         }
+
+        networkBlackjackTable.ConfigurePlayerCount(selectedPlayerCount);
 
         // Host listens on all available network interfaces.
         unityTransport.SetConnectionData("0.0.0.0", port, "0.0.0.0");
@@ -133,10 +178,11 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         if (started)
         {
             SetStatus(
-                "HOST STARTED\n" +
+                "GAME CREATED / HOST STARTED\n\n" +
+                "Players: " + selectedPlayerCount + "\n" +
                 "This Quest IP: " + GetLocalIPv4() + "\n" +
                 "Port: " + port + "\n\n" +
-                "Editor/Laptop should join this IP.\n\n" +
+                "Other Quests press B to join.\n\n" +
                 "Y = New Round\n" +
                 "A = Hit\n" +
                 "B = Stand"
@@ -181,9 +227,10 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         if (started)
         {
             SetStatus(
-                "JOINING HOST\n" +
+                "JOINING GAME\n\n" +
                 "Host IP: " + defaultHostIp + "\n" +
-                "Port: " + port
+                "Port: " + port + "\n\n" +
+                "Waiting for connection..."
             );
         }
         else
@@ -233,7 +280,7 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         string role = NetworkManager.Singleton.IsHost ? "Host" : "Client";
 
         SetStatus(
-            role + " connected.\n" +
+            role + " connected.\n\n" +
             "Client connected: " + clientId + "\n" +
             "Connected clients: " + NetworkManager.Singleton.ConnectedClientsIds.Count + "\n\n" +
             "Y = New Round\n" +
@@ -254,7 +301,7 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         }
 
         SetStatus(
-            role + " disconnected.\n" +
+            role + " disconnected.\n\n" +
             "Client disconnected: " + clientId + "\n" +
             "Connected clients: " + count
         );

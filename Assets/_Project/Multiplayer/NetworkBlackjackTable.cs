@@ -17,6 +17,10 @@ public class NetworkBlackjackTable : NetworkBehaviour
     [Header("UI")]
     public TMP_Text statusText;
 
+    [Header("Game Setup")]
+    [Range(1, 3)]
+    public int configuredPlayerCount = 3;
+
     private BlackjackBattleGame game;
 
     private int playerOneCardIndex;
@@ -25,16 +29,48 @@ public class NetworkBlackjackTable : NetworkBehaviour
     private int dealerCardIndex;
 
     private bool roundStarted;
+    private bool roundResolved;
+
     private bool playerOneCardsShown;
     private bool playerTwoCardsShown;
     private bool playerThreeCardsShown;
+
+    private int currentPlayerIndex;
 
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
-            game = new BlackjackBattleGame(3);
-            UpdateStatusClientRpc("Host ready. Press R to start the round.");
+            configuredPlayerCount = Mathf.Clamp(configuredPlayerCount, 1, 3);
+
+            game = new BlackjackBattleGame(configuredPlayerCount);
+
+            currentPlayerIndex = 0;
+            roundStarted = false;
+            roundResolved = false;
+
+            SendStatusToAll(
+                "Host ready.\n" +
+                "Players: " + configuredPlayerCount + "\n\n" +
+                "Press Y to start the round."
+            );
+        }
+    }
+
+    public void ConfigurePlayerCount(int playerCount)
+    {
+        configuredPlayerCount = Mathf.Clamp(playerCount, 1, 3);
+
+        if (game == null)
+        {
+            return;
+        }
+
+        if (!roundStarted)
+        {
+            game = new BlackjackBattleGame(configuredPlayerCount);
+            currentPlayerIndex = 0;
+            roundResolved = false;
         }
     }
 
@@ -46,14 +82,7 @@ public class NetworkBlackjackTable : NetworkBehaviour
     public void HitButton()
     {
         int playerIndex = GetLocalPlayerIndex();
-
-        if (!HasPlayerCardsShown(playerIndex))
-        {
-            ShowPlayerCardsServerRpc(playerIndex);
-            return;
-        }
-
-        HitServerRpc(playerIndex);
+        HitOrRevealServerRpc(playerIndex);
     }
 
     public void StandButton()
@@ -64,7 +93,7 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
     public void DebugShowPlayerCards(int playerIndex)
     {
-        ShowPlayerCardsServerRpc(playerIndex);
+        HitOrRevealServerRpc(playerIndex);
     }
 
     public void DebugStandPlayer(int playerIndex)
@@ -74,18 +103,22 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
     public void DebugHitPlayer(int playerIndex)
     {
-        HitServerRpc(playerIndex);
+        HitOrRevealServerRpc(playerIndex);
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void StartRoundServerRpc()
     {
-        if (game == null)
+        configuredPlayerCount = Mathf.Clamp(configuredPlayerCount, 1, 3);
+
+        if (game == null || game.Players.Count != configuredPlayerCount)
         {
-            game = new BlackjackBattleGame(3);
+            game = new BlackjackBattleGame(configuredPlayerCount);
         }
 
         roundStarted = true;
+        roundResolved = false;
+        currentPlayerIndex = 0;
 
         playerOneCardsShown = false;
         playerTwoCardsShown = false;
@@ -102,136 +135,194 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
         SpawnDealerHand();
 
-        UpdateStatusClientRpc(
-            "Round " + game.RoundNumber +
-            "\nDealer HP: " + game.Dealer.Hp + "/" + game.Dealer.MaxHp +
-            "\nDealer value: " + game.Dealer.Hand.Value +
-            "\n\nDealer has drawn first." +
-            "\nPress 1 to reveal Player 1 cards." +
-            "\nPress 3 to reveal Player 2 cards." +
-            "\nPress 5 to reveal Player 3 cards."
-        );
+        SendStatusToAll(GetRoundStatusBody());
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    private void ShowPlayerCardsServerRpc(int playerIndex)
+    private void HitOrRevealServerRpc(int playerIndex)
     {
-        if (game == null || !roundStarted)
+        if (game == null || !roundStarted || roundResolved)
         {
             return;
         }
 
-        if (playerIndex < 0 || playerIndex >= game.Players.Count)
+        if (!IsValidActivePlayer(playerIndex))
         {
+            SendStatusToAll(GetRoundStatusBody());
             return;
         }
 
-        if (playerIndex == 0 && playerOneCardsShown)
+        if (playerIndex != currentPlayerIndex)
         {
-            return;
-        }
-
-        if (playerIndex == 1 && playerTwoCardsShown)
-        {
-            return;
-        }
-
-        if (playerIndex == 2 && playerThreeCardsShown)
-        {
-            return;
-        }
-
-        SpawnHandForPlayer(playerIndex);
-
-        if (playerIndex == 0)
-        {
-            playerOneCardsShown = true;
-        }
-        else if (playerIndex == 1)
-        {
-            playerTwoCardsShown = true;
-        }
-        else
-        {
-            playerThreeCardsShown = true;
-        }
-
-        UpdateStatusClientRpc(GetFullRoundStatusText());
-    }
-
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    private void HitServerRpc(int playerIndex)
-    {
-        if (game == null || !roundStarted)
-        {
-            return;
-        }
-
-        if (playerIndex < 0 || playerIndex >= game.Players.Count)
-        {
+            // Wrong player pressed a button. Do not change game state.
+            // Their local UI will still show WAIT.
+            SendStatusToAll(GetRoundStatusBody());
             return;
         }
 
         if (!HasPlayerCardsShown(playerIndex))
         {
-            UpdateStatusClientRpc("Player " + (playerIndex + 1) + " cards are not revealed yet.");
+            RevealPlayerCards(playerIndex);
+            SendStatusToAll(GetRoundStatusBody());
             return;
         }
 
         try
         {
             Card card = game.PlayerHit(playerIndex);
+            SpawnSinglePlayerCard(playerIndex, card);
 
-            if (playerIndex == 0)
+            BlackjackPlayer player = game.Players[playerIndex];
+
+            if (player.HasBustedThisRound)
             {
-                SpawnCardClientRpc((int)card.Suit, (int)card.Rank, 0, playerOneCardIndex);
-                playerOneCardIndex++;
-            }
-            else if (playerIndex == 1)
-            {
-                SpawnCardClientRpc((int)card.Suit, (int)card.Rank, 1, playerTwoCardIndex);
-                playerTwoCardIndex++;
+                AdvanceToNextPlayerOrDealer();
             }
             else
             {
-                SpawnCardClientRpc((int)card.Suit, (int)card.Rank, 2, playerThreeCardIndex);
-                playerThreeCardIndex++;
+                SendStatusToAll(GetRoundStatusBody());
             }
-
-            UpdateStatusClientRpc(GetFullRoundStatusText());
-
-            TryDealerTurnAndResolve();
         }
         catch (System.Exception exception)
         {
-            UpdateStatusClientRpc(exception.Message);
+            SendStatusToAll("Action failed:\n" + exception.Message + "\n\n" + GetRoundStatusBody());
         }
     }
 
     [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void StandServerRpc(int playerIndex)
     {
-        if (game == null || !roundStarted)
+        if (game == null || !roundStarted || roundResolved)
         {
             return;
         }
 
-        if (playerIndex < 0 || playerIndex >= game.Players.Count)
+        if (!IsValidActivePlayer(playerIndex))
         {
+            SendStatusToAll(GetRoundStatusBody());
+            return;
+        }
+
+        if (playerIndex != currentPlayerIndex)
+        {
+            // Wrong player pressed a button. Do not change game state.
+            SendStatusToAll(GetRoundStatusBody());
             return;
         }
 
         if (!HasPlayerCardsShown(playerIndex))
         {
-            UpdateStatusClientRpc("Player " + (playerIndex + 1) + " cards are not revealed yet.");
+            SendStatusToAll(
+                "Player " + (playerIndex + 1) + " must reveal cards first with A.\n\n" +
+                GetRoundStatusBody()
+            );
+
             return;
         }
 
         game.PlayerStand(playerIndex);
 
-        UpdateStatusClientRpc(GetFullRoundStatusText());
+        AdvanceToNextPlayerOrDealer();
+    }
 
-        TryDealerTurnAndResolve();
+    private bool IsValidActivePlayer(int playerIndex)
+    {
+        if (game == null)
+        {
+            return false;
+        }
+
+        return playerIndex >= 0 && playerIndex < game.Players.Count;
+    }
+
+    private void RevealPlayerCards(int playerIndex)
+    {
+        SpawnHandForPlayer(playerIndex);
+        SetPlayerCardsShown(playerIndex, true);
+    }
+
+    private void SpawnSinglePlayerCard(int playerIndex, Card card)
+    {
+        if (playerIndex == 0)
+        {
+            SpawnCardClientRpc((int)card.Suit, (int)card.Rank, 0, playerOneCardIndex);
+            playerOneCardIndex++;
+        }
+        else if (playerIndex == 1)
+        {
+            SpawnCardClientRpc((int)card.Suit, (int)card.Rank, 1, playerTwoCardIndex);
+            playerTwoCardIndex++;
+        }
+        else if (playerIndex == 2)
+        {
+            SpawnCardClientRpc((int)card.Suit, (int)card.Rank, 2, playerThreeCardIndex);
+            playerThreeCardIndex++;
+        }
+    }
+
+    private void AdvanceToNextPlayerOrDealer()
+    {
+        if (game == null)
+        {
+            return;
+        }
+
+        currentPlayerIndex++;
+
+        if (currentPlayerIndex >= game.Players.Count)
+        {
+            PlayDealerAndResolveRound();
+            return;
+        }
+
+        SendStatusToAll(GetRoundStatusBody());
+    }
+
+    private void PlayDealerAndResolveRound()
+    {
+        if (game == null || roundResolved)
+        {
+            return;
+        }
+
+        roundResolved = true;
+
+        game.PlayDealerTurn();
+
+        ClearCardsClientRpc();
+
+        playerOneCardIndex = 0;
+        playerTwoCardIndex = 0;
+        playerThreeCardIndex = 0;
+        dealerCardIndex = 0;
+
+        SpawnDealerHand();
+
+        for (int i = 0; i < game.Players.Count; i++)
+        {
+            SpawnHandForPlayer(i);
+            SetPlayerCardsShown(i, true);
+        }
+
+        var results = game.ResolveRound();
+
+        string resultText = GetRoundStatusBody();
+
+        resultText += "\n\nROUND RESULT\n";
+        resultText += string.Join("\n", results);
+
+        if (game.PlayersHaveWon())
+        {
+            resultText += "\n\nPlayers win the battle!";
+        }
+        else if (game.DealerHasWon())
+        {
+            resultText += "\n\nDealer wins the battle!";
+        }
+
+        resultText += "\n\nPress Y for next round.";
+
+        SendStatusToAll(resultText);
     }
 
     private bool HasPlayerCardsShown(int playerIndex)
@@ -246,57 +337,42 @@ public class NetworkBlackjackTable : NetworkBehaviour
             return playerTwoCardsShown;
         }
 
-        return playerThreeCardsShown;
+        if (playerIndex == 2)
+        {
+            return playerThreeCardsShown;
+        }
+
+        return false;
     }
 
-    private void TryDealerTurnAndResolve()
+    private void SetPlayerCardsShown(int playerIndex, bool shown)
     {
-        if (!playerOneCardsShown || !playerTwoCardsShown || !playerThreeCardsShown)
+        if (playerIndex == 0)
         {
-            return;
+            playerOneCardsShown = shown;
         }
-
-        if (!game.AreAllPlayersDone())
+        else if (playerIndex == 1)
         {
-            return;
+            playerTwoCardsShown = shown;
         }
-
-        game.PlayDealerTurn();
-
-        ClearCardsClientRpc();
-
-        playerOneCardIndex = 0;
-        playerTwoCardIndex = 0;
-        playerThreeCardIndex = 0;
-        dealerCardIndex = 0;
-
-        SpawnDealerHand();
-        SpawnHandForPlayer(0);
-        SpawnHandForPlayer(1);
-        SpawnHandForPlayer(2);
-
-        var results = game.ResolveRound();
-
-        string resultText = GetFullRoundStatusText();
-        resultText += "\n\nRound Result:\n";
-        resultText += string.Join("\n", results);
-
-        if (game.PlayersHaveWon())
+        else if (playerIndex == 2)
         {
-            resultText += "\n\nPlayers win the battle!";
+            playerThreeCardsShown = shown;
         }
-        else if (game.DealerHasWon())
-        {
-            resultText += "\n\nDealer wins the battle!";
-        }
-
-        resultText += "\n\nPress R for next round.";
-
-        UpdateStatusClientRpc(resultText);
     }
 
     private void SpawnHandForPlayer(int playerIndex)
     {
+        if (game == null)
+        {
+            return;
+        }
+
+        if (!IsValidActivePlayer(playerIndex))
+        {
+            return;
+        }
+
         BlackjackPlayer player = game.Players[playerIndex];
 
         for (int i = 0; i < player.Hand.Cards.Count; i++)
@@ -319,7 +395,7 @@ public class NetworkBlackjackTable : NetworkBehaviour
         {
             playerTwoCardIndex = player.Hand.Cards.Count;
         }
-        else
+        else if (playerIndex == 2)
         {
             playerThreeCardIndex = player.Hand.Cards.Count;
         }
@@ -327,6 +403,11 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
     private void SpawnDealerHand()
     {
+        if (game == null)
+        {
+            return;
+        }
+
         for (int i = 0; i < game.Dealer.Hand.Cards.Count; i++)
         {
             Card card = game.Dealer.Hand.Cards[i];
@@ -340,6 +421,80 @@ public class NetworkBlackjackTable : NetworkBehaviour
         }
 
         dealerCardIndex = game.Dealer.Hand.Cards.Count;
+    }
+
+    private void SendStatusToAll(string bodyText)
+    {
+        int activePlayers = configuredPlayerCount;
+
+        if (game != null)
+        {
+            activePlayers = game.Players.Count;
+        }
+
+        UpdatePersonalStatusClientRpc(
+            bodyText,
+            currentPlayerIndex,
+            activePlayers,
+            roundStarted,
+            roundResolved
+        );
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void UpdatePersonalStatusClientRpc(
+        string bodyText,
+        int turnPlayerIndex,
+        int activePlayers,
+        bool isRoundStarted,
+        bool isRoundResolved
+    )
+    {
+        int localPlayerIndex = GetLocalPlayerIndex();
+
+        string header = "";
+
+        if (!isRoundStarted)
+        {
+            header =
+                "LOBBY\n" +
+                "You are Player " + (localPlayerIndex + 1) + "\n\n";
+        }
+        else if (isRoundResolved)
+        {
+            header =
+                "ROUND OVER\n" +
+                "You are Player " + (localPlayerIndex + 1) + "\n\n";
+        }
+        else if (localPlayerIndex >= activePlayers)
+        {
+            header =
+                "SPECTATOR\n" +
+                "Player " + (turnPlayerIndex + 1) + " is playing.\n\n";
+        }
+        else if (localPlayerIndex == turnPlayerIndex)
+        {
+            header =
+                "YOUR TURN\n" +
+                "A = Reveal / Hit\n" +
+                "B = Stand\n\n";
+        }
+        else
+        {
+            header =
+                "WAIT\n" +
+                "Player " + (turnPlayerIndex + 1) + " is playing.\n" +
+                "You are Player " + (localPlayerIndex + 1) + "\n\n";
+        }
+
+        string finalText = header + bodyText;
+
+        Debug.Log(finalText);
+
+        if (statusText != null)
+        {
+            statusText.text = finalText;
+        }
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -373,17 +528,6 @@ public class NetworkBlackjackTable : NetworkBehaviour
         }
     }
 
-    [Rpc(SendTo.ClientsAndHost)]
-    private void UpdateStatusClientRpc(string message)
-    {
-        Debug.Log(message);
-
-        if (statusText != null)
-        {
-            statusText.text = message;
-        }
-    }
-
     private Transform GetSpawnPoint(int areaIndex)
     {
         if (areaIndex == 0)
@@ -406,6 +550,11 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
     private int GetLocalPlayerIndex()
     {
+        if (NetworkManager.Singleton == null)
+        {
+            return 0;
+        }
+
         ulong localClientId = NetworkManager.Singleton.LocalClientId;
 
         if (localClientId == 0)
@@ -421,10 +570,17 @@ public class NetworkBlackjackTable : NetworkBehaviour
         return 2;
     }
 
-    private string GetFullRoundStatusText()
+    private string GetRoundStatusBody()
     {
+        if (game == null)
+        {
+            return "Game not initialized.";
+        }
+
         string text = "";
+
         text += "Round " + game.RoundNumber + "\n";
+        text += "Players: " + configuredPlayerCount + "\n";
         text += "Dealer HP: " + game.Dealer.Hp + "/" + game.Dealer.MaxHp + "\n";
         text += "Dealer value: " + game.Dealer.Hand.Value + "\n\n";
 
@@ -432,12 +588,19 @@ public class NetworkBlackjackTable : NetworkBehaviour
         {
             BlackjackPlayer player = game.Players[i];
 
-            text += player.Name +
-                    " Hearts: " + player.Hearts;
+            text += "Player " + (i + 1);
+
+            if (!roundResolved && i == currentPlayerIndex)
+            {
+                text += " [TURN]";
+            }
+
+            text += "\n";
+            text += "Hearts: " + player.Hearts + "\n";
 
             if (HasPlayerCardsShown(i))
             {
-                text += " | Hand: " + player.Hand.Value;
+                text += "Hand: " + player.Hand.Value;
 
                 if (player.HasBustedThisRound)
                 {
@@ -447,10 +610,12 @@ public class NetworkBlackjackTable : NetworkBehaviour
                 {
                     text += " | STAND";
                 }
+
+                text += "\n";
             }
             else
             {
-                text += " | Cards hidden";
+                text += "Cards hidden\n";
             }
 
             text += "\n";
