@@ -7,11 +7,11 @@ public class VRPhysicalButton : MonoBehaviour
     {
         Hit,
         Stand,
-        Reset
+        NewRound
     }
 
     [Header("References")]
-    public VRBlackjackController blackjackController;
+    public NetworkBlackjackTable networkBlackjackTable;
 
     [Header("Button Settings")]
     public ButtonAction action;
@@ -46,27 +46,27 @@ public class VRPhysicalButton : MonoBehaviour
 
         lastPressTime = Time.time;
 
-        if (blackjackController == null)
+        if (networkBlackjackTable == null)
         {
-            Debug.LogWarning("VRPhysicalButton: No blackjack controller assigned.");
+            Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
             return;
         }
 
         switch (action)
         {
             case ButtonAction.Hit:
-                blackjackController.PlayerHit();
+                networkBlackjackTable.HitButton();
                 Debug.Log("VR Button pressed: HIT");
                 break;
 
             case ButtonAction.Stand:
-                blackjackController.Stand();
+                networkBlackjackTable.StandButton();
                 Debug.Log("VR Button pressed: STAND");
                 break;
 
-            case ButtonAction.Reset:
-                blackjackController.ResetRound();
-                Debug.Log("VR Button pressed: RESET");
+            case ButtonAction.NewRound:
+                networkBlackjackTable.StartRoundButton();
+                Debug.Log("VR Button pressed: NEW ROUND");
                 break;
         }
 

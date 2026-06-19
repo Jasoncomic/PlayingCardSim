@@ -46,6 +46,13 @@ public class NetworkBlackjackTable : NetworkBehaviour
     public void HitButton()
     {
         int playerIndex = GetLocalPlayerIndex();
+
+        if (!HasPlayerCardsShown(playerIndex))
+        {
+            ShowPlayerCardsServerRpc(playerIndex);
+            return;
+        }
+
         HitServerRpc(playerIndex);
     }
 
