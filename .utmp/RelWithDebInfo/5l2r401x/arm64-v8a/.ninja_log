@@ -1,0 +1,10 @@
+# ninja log v5
+23	2219	8035775619526471	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	c6c2e7cc40d99dd4
+30	2234	8035775619707546	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	42f36596065edb4e
+16	2272	8035775620102794	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	f0efd043462bd62d
+55	2274	8035775620102794	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	82ad032f814d57b3
+0	2344	8035775620753811	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	a468f62d79853b34
+38	2510	8035775622433788	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	1fe85472cd95be64
+9	2621	8035775623474382	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	ac683ccf667da349
+45	2791	8035775625235337	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	2919baa0a07b3861
+2791	2994	8035775627263555	D:/FH/GameDev/Projekt/PlayingCardSim/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/5l2r401x/obj/arm64-v8a/libgame.so	d68ebdf646bbfa3d

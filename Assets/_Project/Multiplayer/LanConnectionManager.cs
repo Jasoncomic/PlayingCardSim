@@ -20,6 +20,24 @@ public class LanConnectionManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientConnectedCallback -= OnClientConnected;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= OnClientDisconnected;
+        }
+    }
+
     public void StartHost()
     {
         if (unityTransport == null)
@@ -34,7 +52,7 @@ public class LanConnectionManager : MonoBehaviour
 
         if (started)
         {
-            SetStatus("Host started.");
+            SetStatus("Host started. Waiting for clients...");
         }
         else
         {
@@ -69,7 +87,7 @@ public class LanConnectionManager : MonoBehaviour
 
         if (started)
         {
-            SetStatus("Joining host...");
+            SetStatus("Joining host at " + ip + "...");
         }
         else
         {
@@ -77,9 +95,27 @@ public class LanConnectionManager : MonoBehaviour
         }
     }
 
+    private void OnClientConnected(ulong clientId)
+    {
+        string message =
+            "Client connected: " + clientId +
+            "\nConnected clients: " + NetworkManager.Singleton.ConnectedClientsIds.Count;
+
+        SetStatus(message);
+    }
+
+    private void OnClientDisconnected(ulong clientId)
+    {
+        string message =
+            "Client disconnected: " + clientId +
+            "\nConnected clients: " + NetworkManager.Singleton.ConnectedClientsIds.Count;
+
+        SetStatus(message);
+    }
+
     private void SetStatus(string message)
     {
-        Debug.Log(message);
+        Debug.Log("[LAN] " + message);
 
         if (statusText != null)
         {
