@@ -7,11 +7,16 @@ public class VRPhysicalButton : MonoBehaviour
     {
         Hit,
         Stand,
-        NewRound
+        NewRound,
+        HelpToggle
     }
 
     [Header("References")]
     public NetworkBlackjackTable networkBlackjackTable;
+
+    [Header("Help Paper")]
+    public GameObject helpPaper;
+    public bool helpPaperStartsHidden = true;
 
     [Header("Button Settings")]
     public ButtonAction action;
@@ -27,6 +32,16 @@ public class VRPhysicalButton : MonoBehaviour
     private void Awake()
     {
         originalScale = transform.localScale;
+    }
+
+    private void Start()
+    {
+        if (action == ButtonAction.HelpToggle &&
+            helpPaper != null &&
+            helpPaperStartsHidden)
+        {
+            helpPaper.SetActive(false);
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -46,25 +61,42 @@ public class VRPhysicalButton : MonoBehaviour
 
         lastPressTime = Time.time;
 
-        if (networkBlackjackTable == null)
-        {
-            Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
-            return;
-        }
-
         switch (action)
         {
+            case ButtonAction.HelpToggle:
+                ToggleHelpPaper();
+                Debug.Log("VR Button pressed: HELP");
+                break;
+
             case ButtonAction.Hit:
+                if (networkBlackjackTable == null)
+                {
+                    Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
+                    return;
+                }
+
                 networkBlackjackTable.HitButton();
                 Debug.Log("VR Button pressed: HIT");
                 break;
 
             case ButtonAction.Stand:
+                if (networkBlackjackTable == null)
+                {
+                    Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
+                    return;
+                }
+
                 networkBlackjackTable.StandButton();
                 Debug.Log("VR Button pressed: STAND");
                 break;
 
             case ButtonAction.NewRound:
+                if (networkBlackjackTable == null)
+                {
+                    Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
+                    return;
+                }
+
                 networkBlackjackTable.StartRoundButton();
                 Debug.Log("VR Button pressed: NEW ROUND");
                 break;
@@ -72,6 +104,17 @@ public class VRPhysicalButton : MonoBehaviour
 
         StopAllCoroutines();
         StartCoroutine(PlayPressAnimation());
+    }
+
+    private void ToggleHelpPaper()
+    {
+        if (helpPaper == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: Help Paper is not assigned.");
+            return;
+        }
+
+        helpPaper.SetActive(!helpPaper.activeSelf);
     }
 
     private bool IsControllerOrHand(GameObject obj)
