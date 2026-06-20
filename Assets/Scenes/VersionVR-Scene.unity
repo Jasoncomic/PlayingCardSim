@@ -9100,9 +9100,11 @@ MonoBehaviour:
   unityTransport: {fileID: 545293069}
   networkBlackjackTable: {fileID: 1279361256}
   statusText: {fileID: 1164673498}
-  defaultHostIp: 192.168.0.130
+  defaultHostIp: 192.168.0.200
   port: 7777
   selectedPlayerCount: 2
+  joinIpLastNumber: 220
+  ipChangeCooldown: 0.18
 --- !u!4 &1151038786
 Transform:
   m_ObjectHideFlags: 0
