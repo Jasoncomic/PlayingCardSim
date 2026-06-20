@@ -133,7 +133,9 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
         game.StartNewRound();
 
-        SpawnDealerHand();
+        // Dealer opening: only first dealer card is shown.
+        // The hidden dealer card is not spawned until dealer turn.
+        SpawnDealerOpeningCard();
 
         SendStatusToAll(GetRoundStatusBody());
     }
@@ -154,8 +156,6 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
         if (playerIndex != currentPlayerIndex)
         {
-            // Wrong player pressed a button. Do not change game state.
-            // Their local UI will still show WAIT.
             SendStatusToAll(GetRoundStatusBody());
             return;
         }
@@ -205,7 +205,6 @@ public class NetworkBlackjackTable : NetworkBehaviour
 
         if (playerIndex != currentPlayerIndex)
         {
-            // Wrong player pressed a button. Do not change game state.
             SendStatusToAll(GetRoundStatusBody());
             return;
         }
@@ -296,7 +295,8 @@ public class NetworkBlackjackTable : NetworkBehaviour
         playerThreeCardIndex = 0;
         dealerCardIndex = 0;
 
-        SpawnDealerHand();
+        // Dealer reveal: now all dealer cards are shown.
+        SpawnDealerFullHand();
 
         for (int i = 0; i < game.Players.Count; i++)
         {
@@ -401,7 +401,31 @@ public class NetworkBlackjackTable : NetworkBehaviour
         }
     }
 
-    private void SpawnDealerHand()
+    private void SpawnDealerOpeningCard()
+    {
+        if (game == null)
+        {
+            return;
+        }
+
+        if (game.Dealer.Hand.Cards.Count <= 0)
+        {
+            return;
+        }
+
+        Card firstDealerCard = game.Dealer.Hand.Cards[0];
+
+        SpawnCardClientRpc(
+            (int)firstDealerCard.Suit,
+            (int)firstDealerCard.Rank,
+            3,
+            0
+        );
+
+        dealerCardIndex = 1;
+    }
+
+    private void SpawnDealerFullHand()
     {
         if (game == null)
         {
@@ -582,7 +606,17 @@ public class NetworkBlackjackTable : NetworkBehaviour
         text += "Round " + game.RoundNumber + "\n";
         text += "Players: " + configuredPlayerCount + "\n";
         text += "Dealer HP: " + game.Dealer.Hp + "/" + game.Dealer.MaxHp + "\n";
-        text += "Dealer value: " + game.Dealer.Hand.Value + "\n\n";
+
+        if (roundResolved)
+        {
+            text += "Dealer value: " + game.Dealer.Hand.Value + "\n";
+        }
+        else
+        {
+            text += "Dealer: 1 card visible, 1 card hidden\n";
+        }
+
+        text += "\n";
 
         for (int i = 0; i < game.Players.Count; i++)
         {

@@ -6,6 +6,10 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEngine.InputSystem;
+#endif
+
 public class StandaloneQuestNetworkInput : MonoBehaviour
 {
     [Header("Network")]
@@ -62,7 +66,6 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
 
     private void HandleMenuInput()
     {
-        // Left controller X = player count down
         if (OVRInput.GetDown(OVRInput.RawButton.X))
         {
             selectedPlayerCount--;
@@ -75,7 +78,6 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
             ShowPreConnectionMenu();
         }
 
-        // Left controller Y = player count up
         if (OVRInput.GetDown(OVRInput.RawButton.Y))
         {
             selectedPlayerCount++;
@@ -88,13 +90,11 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
             ShowPreConnectionMenu();
         }
 
-        // Right controller A = Create Game / Host
         if (OVRInput.GetDown(OVRInput.RawButton.A))
         {
             StartQuestHost();
         }
 
-        // Right controller B = Join Game / Client
         if (OVRInput.GetDown(OVRInput.RawButton.B))
         {
             JoinQuestHost();
@@ -109,24 +109,55 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
             return;
         }
 
-        // A = Hit / reveal own cards first
+        // Quest controller input
         if (OVRInput.GetDown(OVRInput.RawButton.A))
         {
             networkBlackjackTable.HitButton();
         }
 
-        // B = Stand
         if (OVRInput.GetDown(OVRInput.RawButton.B))
         {
             networkBlackjackTable.StandButton();
         }
 
-        // Y = Start new round
         if (OVRInput.GetDown(OVRInput.RawButton.Y))
         {
             networkBlackjackTable.StartRoundButton();
         }
+
+#if UNITY_EDITOR
+        HandleEditorKeyboardInput();
+#endif
     }
+
+#if UNITY_EDITOR
+    private void HandleEditorKeyboardInput()
+    {
+        if (Keyboard.current == null)
+        {
+            return;
+        }
+
+        // Editor/Laptop test input:
+        // H = Hit / Reveal
+        // J = Stand
+        // R = New Round
+        if (Keyboard.current.hKey.wasPressedThisFrame)
+        {
+            networkBlackjackTable.HitButton();
+        }
+
+        if (Keyboard.current.jKey.wasPressedThisFrame)
+        {
+            networkBlackjackTable.StandButton();
+        }
+
+        if (Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            networkBlackjackTable.StartRoundButton();
+        }
+    }
+#endif
 
     private void ShowPreConnectionMenu()
     {
@@ -170,7 +201,6 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
 
         networkBlackjackTable.ConfigurePlayerCount(selectedPlayerCount);
 
-        // Host listens on all available network interfaces.
         unityTransport.SetConnectionData("0.0.0.0", port, "0.0.0.0");
 
         bool started = NetworkManager.Singleton.StartHost();
@@ -285,7 +315,15 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
             "Connected clients: " + NetworkManager.Singleton.ConnectedClientsIds.Count + "\n\n" +
             "Y = New Round\n" +
             "A = Hit\n" +
-            "B = Stand"
+            "B = Stand\n\n" +
+#if UNITY_EDITOR
+            "Editor test:\n" +
+            "R = New Round\n" +
+            "H = Hit / Reveal\n" +
+            "J = Stand"
+#else
+            ""
+#endif
         );
     }
 
