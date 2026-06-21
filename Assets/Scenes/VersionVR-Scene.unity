@@ -1318,6 +1318,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 315928639}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -3064,6 +3068,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 1729612488}
@@ -6936,7 +6944,7 @@ GameObject:
   - component: {fileID: 574820320}
   - component: {fileID: 574820319}
   - component: {fileID: 574820318}
-  - component: {fileID: 574820316}
+  - component: {fileID: 574820321}
   m_Layer: 0
   m_Name: Button_ConfirmButton
   m_TagString: Untagged
@@ -6960,26 +6968,6 @@ Transform:
   - {fileID: 711788233}
   m_Father: {fileID: 1112688809}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &574820316
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 574820314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 6
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &574820318
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7058,6 +7046,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 574820314}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &574820321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574820314}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 15
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1 &576118262
 GameObject:
   m_ObjectHideFlags: 0
@@ -8565,6 +8577,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 1729612488}
@@ -8776,6 +8792,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 2085162143}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -10077,6 +10097,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -12463,6 +12487,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 2085162143}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -12733,6 +12761,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -13256,7 +13288,7 @@ GameObject:
   - component: {fileID: 1040706388}
   - component: {fileID: 1040706387}
   - component: {fileID: 1040706386}
-  - component: {fileID: 1040706384}
+  - component: {fileID: 1040706389}
   m_Layer: 0
   m_Name: Button_JoinGame
   m_TagString: Untagged
@@ -13280,26 +13312,6 @@ Transform:
   - {fileID: 630406161}
   m_Father: {fileID: 568536880}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &1040706384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1040706382}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 1
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &1040706386
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13378,6 +13390,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1040706382}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1040706389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1040706382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 10
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1001 &1041390952
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18013,6 +18049,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -18364,6 +18404,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -18497,6 +18541,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 1729612488}
@@ -19409,7 +19457,7 @@ GameObject:
   - component: {fileID: 1403345684}
   - component: {fileID: 1403345683}
   - component: {fileID: 1403345682}
-  - component: {fileID: 1403345680}
+  - component: {fileID: 1403345685}
   m_Layer: 0
   m_Name: Button_CreateGame
   m_TagString: Untagged
@@ -19433,26 +19481,6 @@ Transform:
   - {fileID: 65164499}
   m_Father: {fileID: 568536880}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &1403345680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1403345678}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 0
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &1403345682
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -19531,6 +19559,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1403345678}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1403345685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403345678}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 9
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1 &1403711975
 GameObject:
   m_ObjectHideFlags: 0
@@ -20203,7 +20255,7 @@ GameObject:
   - component: {fileID: 1432158402}
   - component: {fileID: 1432158401}
   - component: {fileID: 1432158400}
-  - component: {fileID: 1432158398}
+  - component: {fileID: 1432158403}
   m_Layer: 0
   m_Name: Button_1Player
   m_TagString: Untagged
@@ -20227,26 +20279,6 @@ Transform:
   - {fileID: 1298848945}
   m_Father: {fileID: 1112688809}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &1432158398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1432158396}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 2
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &1432158400
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20325,6 +20357,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1432158396}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1432158403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1432158396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 11
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1 &1434101075
 GameObject:
   m_ObjectHideFlags: 0
@@ -25474,7 +25530,7 @@ GameObject:
   - component: {fileID: 1899831905}
   - component: {fileID: 1899831904}
   - component: {fileID: 1899831903}
-  - component: {fileID: 1899831901}
+  - component: {fileID: 1899831906}
   m_Layer: 0
   m_Name: Button_3Player
   m_TagString: Untagged
@@ -25498,26 +25554,6 @@ Transform:
   - {fileID: 1235219985}
   m_Father: {fileID: 1112688809}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &1899831901
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1899831899}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 4
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &1899831903
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25596,6 +25632,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1899831899}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1899831906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1899831899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 13
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1 &1904652800
 GameObject:
   m_ObjectHideFlags: 0
@@ -26149,7 +26209,7 @@ GameObject:
   - component: {fileID: 1930959484}
   - component: {fileID: 1930959483}
   - component: {fileID: 1930959482}
-  - component: {fileID: 1930959480}
+  - component: {fileID: 1930959485}
   m_Layer: 0
   m_Name: Button_Back
   m_TagString: Untagged
@@ -26173,26 +26233,6 @@ Transform:
   - {fileID: 822149593}
   m_Father: {fileID: 1112688809}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &1930959480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1930959478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 5
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &1930959482
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26271,6 +26311,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930959478}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1930959485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1930959478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 14
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1 &1933468250
 GameObject:
   m_ObjectHideFlags: 0
@@ -26579,6 +26643,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 81371728}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -27019,6 +27087,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 0}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}
@@ -27760,7 +27832,7 @@ GameObject:
   - component: {fileID: 2071169726}
   - component: {fileID: 2071169725}
   - component: {fileID: 2071169724}
-  - component: {fileID: 2071169722}
+  - component: {fileID: 2071169727}
   m_Layer: 0
   m_Name: Button_2Player
   m_TagString: Untagged
@@ -27784,26 +27856,6 @@ Transform:
   - {fileID: 1208742502}
   m_Father: {fileID: 1112688809}
   m_LocalEulerAnglesHint: {x: -2.03, y: 1.47, z: 0.37}
---- !u!114 &2071169722
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2071169720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6c1bd25763caeb489df53728fd8e3ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VRSessionBoardMenu
-  questNetworkInput: {fileID: 1151038785}
-  mainMenuRoot: {fileID: 568536879}
-  createGameMenuRoot: {fileID: 1112688808}
-  menuStatusText: {fileID: 1164673498}
-  action: 3
-  cooldown: 0.7
-  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
-  pressAnimationTime: 0.12
 --- !u!65 &2071169724
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -27882,6 +27934,30 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2071169720}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &2071169727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071169720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaper: {fileID: 0}
+  helpPaperStartsHidden: 1
+  musicSettings: {fileID: 0}
+  action: 12
+  cooldown: 0.7
+  pressedScaleMultiplier: {x: 0.9, y: 0.6, z: 0.9}
+  pressAnimationTime: 0.12
 --- !u!1 &2085162143
 GameObject:
   m_ObjectHideFlags: 0
@@ -28497,6 +28573,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   networkBlackjackTable: {fileID: 0}
+  questNetworkInput: {fileID: 0}
+  mainMenuRoot: {fileID: 0}
+  createGameMenuRoot: {fileID: 0}
+  menuStatusText: {fileID: 0}
   helpPaper: {fileID: 315928639}
   helpPaperStartsHidden: 1
   musicSettings: {fileID: 0}

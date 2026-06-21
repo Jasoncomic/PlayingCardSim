@@ -347,19 +347,14 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
 
         if (started)
         {
-            SetStatus(
-                "GAME CREATED / HOST STARTED\n\n" +
-                "Players: " + selectedPlayerCount + "\n\n" +
-                "HOST IP FOR OTHER QUESTS\n" +
-                "This Quest IP: " + GetLocalIPv4() + "\n" +
-                "Port: " + port + "\n\n" +
-                "On the other Quests:\n" +
-                "Set Join IP to this IP.\n" +
-                "Then press B to join.\n\n" +
-                "Y = New Round\n" +
-                "A = Hit\n" +
-                "B = Stand"
-            );
+            if (selectedPlayerCount == 1)
+            {
+                SetStatus(GetSinglePlayerCreatedText());
+            }
+            else
+            {
+                SetStatus(GetMultiplayerHostCreatedText());
+            }
         }
         else
         {
@@ -412,6 +407,33 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
         {
             SetStatus("Client failed to start.");
         }
+    }
+
+    private string GetSinglePlayerCreatedText()
+    {
+        return
+            "SINGLE PLAYER GAME CREATED\n\n" +
+            "Players: 1\n\n" +
+            "CONTROLS\n" +
+            "Y = Start Round / New Round\n" +
+            "A = Reveal / Hit\n" +
+            "B = Stand / Dealer Turn";
+    }
+
+    private string GetMultiplayerHostCreatedText()
+    {
+        return
+            "GAME CREATED / HOST STARTED\n\n" +
+            "Players: " + selectedPlayerCount + "\n\n" +
+            "HOST IP FOR OTHER QUESTS\n" +
+            "This Quest IP: " + GetLocalIPv4() + "\n" +
+            "Port: " + port + "\n\n" +
+            "On the other Quests:\n" +
+            "Set Join IP to this IP.\n" +
+            "Then press B to join.\n\n" +
+            "Y = New Round\n" +
+            "A = Hit\n" +
+            "B = Stand";
     }
 
     private void ParseDefaultHostIp()
@@ -506,6 +528,12 @@ public class StandaloneQuestNetworkInput : MonoBehaviour
     private void OnClientConnected(ulong clientId)
     {
         string role = NetworkManager.Singleton.IsHost ? "Host" : "Client";
+
+        if (NetworkManager.Singleton.IsHost && selectedPlayerCount == 1)
+        {
+            SetStatus(GetSinglePlayerCreatedText());
+            return;
+        }
 
         string message =
             role + " connected.\n\n" +

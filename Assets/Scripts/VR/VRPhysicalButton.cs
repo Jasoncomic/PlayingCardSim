@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
@@ -15,11 +16,26 @@ public class VRPhysicalButton : MonoBehaviour
         Music,
         ClosePaper,
         MusicVolumeDown,
-        MusicVolumeUp
+        MusicVolumeUp,
+
+        // Session board menu actions
+        OpenCreateMenu,
+        JoinGame,
+        SelectOnePlayer,
+        SelectTwoPlayers,
+        SelectThreePlayers,
+        BackToMainMenu,
+        ConfirmCreateGame
     }
 
     [Header("References")]
     public NetworkBlackjackTable networkBlackjackTable;
+
+    [Header("Quest Network / Session Menu")]
+    public StandaloneQuestNetworkInput questNetworkInput;
+    public GameObject mainMenuRoot;
+    public GameObject createGameMenuRoot;
+    public TMP_Text menuStatusText;
 
     [Header("Help / Paper Target")]
     public GameObject helpPaper;
@@ -138,6 +154,140 @@ public class VRPhysicalButton : MonoBehaviour
                 networkBlackjackTable.StartRoundButton();
                 Debug.Log("VR Button pressed: NEW ROUND");
                 break;
+
+            case ButtonAction.OpenCreateMenu:
+                ShowCreateGameMenu();
+                Debug.Log("VR Button pressed: OPEN CREATE MENU");
+                break;
+
+            case ButtonAction.JoinGame:
+                JoinGame();
+                Debug.Log("VR Button pressed: JOIN GAME");
+                break;
+
+            case ButtonAction.SelectOnePlayer:
+                SelectPlayerCount(1);
+                Debug.Log("VR Button pressed: SELECT 1 PLAYER");
+                break;
+
+            case ButtonAction.SelectTwoPlayers:
+                SelectPlayerCount(2);
+                Debug.Log("VR Button pressed: SELECT 2 PLAYERS");
+                break;
+
+            case ButtonAction.SelectThreePlayers:
+                SelectPlayerCount(3);
+                Debug.Log("VR Button pressed: SELECT 3 PLAYERS");
+                break;
+
+            case ButtonAction.BackToMainMenu:
+                ShowMainMenu();
+                Debug.Log("VR Button pressed: BACK TO MAIN MENU");
+                break;
+
+            case ButtonAction.ConfirmCreateGame:
+                ConfirmCreateGame();
+                Debug.Log("VR Button pressed: CONFIRM CREATE GAME");
+                break;
+        }
+    }
+
+    private void ShowCreateGameMenu()
+    {
+        if (mainMenuRoot != null)
+        {
+            mainMenuRoot.SetActive(false);
+        }
+
+        if (createGameMenuRoot != null)
+        {
+            createGameMenuRoot.SetActive(true);
+        }
+
+        int selectedPlayers = 3;
+
+        if (questNetworkInput != null)
+        {
+            selectedPlayers = questNetworkInput.selectedPlayerCount;
+        }
+
+        SetMenuStatus(
+            "CREATE GAME\n\n" +
+            "Selected Players: " + selectedPlayers + "\n\n" +
+            "Choose 1, 2 or 3 players.\n" +
+            "Then press CREATE."
+        );
+    }
+
+    private void ShowMainMenu()
+    {
+        if (mainMenuRoot != null)
+        {
+            mainMenuRoot.SetActive(true);
+        }
+
+        if (createGameMenuRoot != null)
+        {
+            createGameMenuRoot.SetActive(false);
+        }
+
+        SetMenuStatus("Choose CREATE GAME or JOIN GAME.");
+    }
+
+    private void SelectPlayerCount(int playerCount)
+    {
+        if (questNetworkInput == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: No StandaloneQuestNetworkInput assigned.");
+            return;
+        }
+
+        questNetworkInput.selectedPlayerCount = Mathf.Clamp(playerCount, 1, 3);
+
+        SetMenuStatus(
+            "Selected Players: " + questNetworkInput.selectedPlayerCount + "\n\n" +
+            "Press CREATE to start the game.\n" +
+            "Press BACK to return."
+        );
+    }
+
+    private void ConfirmCreateGame()
+    {
+        if (questNetworkInput == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: No StandaloneQuestNetworkInput assigned.");
+            return;
+        }
+
+        SetMenuStatus(
+            "Creating game with " +
+            questNetworkInput.selectedPlayerCount +
+            " player(s)..."
+        );
+
+        questNetworkInput.StartQuestHost();
+    }
+
+    private void JoinGame()
+    {
+        if (questNetworkInput == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: No StandaloneQuestNetworkInput assigned.");
+            return;
+        }
+
+        SetMenuStatus("Joining game...");
+
+        questNetworkInput.JoinQuestHost();
+    }
+
+    private void SetMenuStatus(string message)
+    {
+        Debug.Log("[VRPhysicalButton] " + message);
+
+        if (menuStatusText != null)
+        {
+            menuStatusText.text = message;
         }
     }
 
