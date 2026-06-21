@@ -54,6 +54,13 @@ public class MusicManager : MonoBehaviour
         {
             PlayMusic();
         }
+
+            Debug.Log("MusicManager started");
+
+    if (playOnStart && musicClip != null)
+    {
+        PlayMusic();
+    }
     }
 
     public void PlayMusic()
@@ -80,6 +87,8 @@ public class MusicManager : MonoBehaviour
         {
             audioSource.volume = volume;
         }
+
+        Debug.Log("Playing music");
     }
 
     public void StopMusic()
@@ -90,7 +99,11 @@ public class MusicManager : MonoBehaviour
     public void SetVolume(float newVolume)
     {
         volume = Mathf.Clamp01(newVolume);
-        audioSource.volume = volume;
+
+        if (audioSource.isPlaying)
+        {
+            audioSource.volume = volume;
+        }
     }
 
     public void FadeTo(float targetVolume, float duration)
