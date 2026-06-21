@@ -57,7 +57,7 @@ public class CardDrawer : MonoBehaviour
             return;
         }
 
-        Vector3 offset = new Vector3(cardIndex * 0.18f, 0.01f, 0f);
+        Vector3 offset = new Vector3(cardIndex * 0.35f, 0.01f, 0f);
 
         GameObject cardObject = Instantiate(
             cardPrefab,
