@@ -1,8 +1,5 @@
-using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using Unity.Netcode;
 
 public class VRPhysicalButton : MonoBehaviour
 {
@@ -11,6 +8,7 @@ public class VRPhysicalButton : MonoBehaviour
         Hit,
         Stand,
         NewRound,
+
         HelpToggle,
         MainMenu,
         Music,
@@ -18,68 +16,81 @@ public class VRPhysicalButton : MonoBehaviour
         MusicVolumeDown,
         MusicVolumeUp,
 
-        // Session board menu actions
         OpenCreateMenu,
         JoinGame,
         SelectOnePlayer,
         SelectTwoPlayers,
         SelectThreePlayers,
         BackToMainMenu,
-        ConfirmCreateGame
+        ConfirmCreateGame,
+
+        NewGame
     }
 
-    [Header("References")]
+    [Header("Button Action")]
+    public ButtonAction action;
+
+    [Header("Blackjack")]
     public NetworkBlackjackTable networkBlackjackTable;
 
-    [Header("Quest Network / Session Menu")]
+    [Header("Quest Network Menu")]
     public StandaloneQuestNetworkInput questNetworkInput;
     public GameObject mainMenuRoot;
     public GameObject createGameMenuRoot;
     public TMP_Text menuStatusText;
 
-    [Header("Help / Paper Target")]
-    public GameObject helpPaper;
-    public bool helpPaperStartsHidden = true;
+    [Header("Paper / Menu UI")]
+    public GameObject helpPaperRoot;
+    public GameObject settingsPaperRoot;
 
-    [Header("Music Settings")]
-    public VRMusicSettings musicSettings;
+    [Header("Music")]
+    public AudioSource musicAudioSource;
+    [Range(0f, 1f)]
+    public float volumeStep = 0.1f;
 
-    [Header("Button Settings")]
-    public ButtonAction action;
+    [Header("Press Settings")]
+    public Transform visualTarget;
+    public Vector3 pressedLocalOffset = new Vector3(0f, -0.015f, 0f);
+    public float pressDuration = 0.12f;
     public float cooldown = 0.7f;
 
-    [Header("Visual Feedback")]
-    public Vector3 pressedScaleMultiplier = new Vector3(0.9f, 0.6f, 0.9f);
-    public float pressAnimationTime = 0.12f;
-
-    private Vector3 originalScale;
+    private Vector3 originalLocalPosition;
+    private bool hasOriginalPosition;
+    private bool isPressed;
     private float lastPressTime = -999f;
-    private Coroutine pressAnimationCoroutine;
 
     private void Awake()
     {
-        originalScale = transform.localScale;
-    }
-
-    private void Start()
-    {
-        if (action == ButtonAction.HelpToggle &&
-            helpPaper != null &&
-            helpPaperStartsHidden)
+        if (visualTarget == null)
         {
-            helpPaper.SetActive(false);
+            visualTarget = transform;
         }
+
+        originalLocalPosition = visualTarget.localPosition;
+        hasOriginalPosition = true;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (IsControllerOrHand(other.gameObject))
-        {
-            PressButton();
-        }
+        TryPress();
+    }
+
+    public void Press()
+    {
+        TryPress();
     }
 
     public void PressButton()
+    {
+        TryPress();
+    }
+
+    public void TriggerButton()
+    {
+        TryPress();
+    }
+
+    private void TryPress()
     {
         if (Time.time - lastPressTime < cooldown)
         {
@@ -88,106 +99,131 @@ public class VRPhysicalButton : MonoBehaviour
 
         lastPressTime = Time.time;
 
-        PlayButtonAnimation();
+        PlayPressAnimation();
+        ExecuteAction();
+    }
 
+    private void PlayPressAnimation()
+    {
+        if (!gameObject.activeInHierarchy)
+        {
+            return;
+        }
+
+        StopAllCoroutines();
+        StartCoroutine(PressAnimationRoutine());
+    }
+
+    private System.Collections.IEnumerator PressAnimationRoutine()
+    {
+        if (visualTarget == null)
+        {
+            yield break;
+        }
+
+        if (!hasOriginalPosition)
+        {
+            originalLocalPosition = visualTarget.localPosition;
+            hasOriginalPosition = true;
+        }
+
+        if (isPressed)
+        {
+            yield break;
+        }
+
+        isPressed = true;
+
+        visualTarget.localPosition = originalLocalPosition + pressedLocalOffset;
+
+        yield return new WaitForSeconds(pressDuration);
+
+        visualTarget.localPosition = originalLocalPosition;
+        isPressed = false;
+    }
+
+    private void ExecuteAction()
+    {
         switch (action)
         {
-            case ButtonAction.HelpToggle:
-                ToggleHelpPaper();
-                Debug.Log("VR Button pressed: HELP / SETTINGS TOGGLE");
+            case ButtonAction.Hit:
+                if (networkBlackjackTable != null)
+                {
+                    networkBlackjackTable.HitButton();
+                }
                 break;
 
-            case ButtonAction.ClosePaper:
-                ClosePaper();
-                Debug.Log("VR Button pressed: CLOSE PAPER");
+            case ButtonAction.Stand:
+                if (networkBlackjackTable != null)
+                {
+                    networkBlackjackTable.StandButton();
+                }
+                break;
+
+            case ButtonAction.NewRound:
+                if (networkBlackjackTable != null)
+                {
+                    networkBlackjackTable.StartRoundButton();
+                }
+                break;
+
+            case ButtonAction.NewGame:
+                if (networkBlackjackTable != null)
+                {
+                    networkBlackjackTable.NewGameButton();
+                }
+                break;
+
+            case ButtonAction.HelpToggle:
+                ToggleObject(helpPaperRoot);
                 break;
 
             case ButtonAction.MainMenu:
-                Debug.Log("VR Button pressed: MAIN MENU");
-                StartCoroutine(RestartToMainMenuRoutine());
+                ShowMainMenu();
                 break;
 
             case ButtonAction.Music:
                 ToggleMusic();
-                Debug.Log("VR Button pressed: MUSIC TOGGLE");
+                break;
+
+            case ButtonAction.ClosePaper:
+                ClosePapers();
                 break;
 
             case ButtonAction.MusicVolumeDown:
-                ChangeMusicVolumeDown();
-                Debug.Log("VR Button pressed: MUSIC VOLUME DOWN");
+                ChangeMusicVolume(-volumeStep);
                 break;
 
             case ButtonAction.MusicVolumeUp:
-                ChangeMusicVolumeUp();
-                Debug.Log("VR Button pressed: MUSIC VOLUME UP");
-                break;
-
-            case ButtonAction.Hit:
-                if (networkBlackjackTable == null)
-                {
-                    Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
-                    return;
-                }
-
-                networkBlackjackTable.HitButton();
-                Debug.Log("VR Button pressed: HIT");
-                break;
-
-            case ButtonAction.Stand:
-                if (networkBlackjackTable == null)
-                {
-                    Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
-                    return;
-                }
-
-                networkBlackjackTable.StandButton();
-                Debug.Log("VR Button pressed: STAND");
-                break;
-
-            case ButtonAction.NewRound:
-                if (networkBlackjackTable == null)
-                {
-                    Debug.LogWarning("VRPhysicalButton: No NetworkBlackjackTable assigned.");
-                    return;
-                }
-
-                networkBlackjackTable.StartRoundButton();
-                Debug.Log("VR Button pressed: NEW ROUND");
+                ChangeMusicVolume(volumeStep);
                 break;
 
             case ButtonAction.OpenCreateMenu:
                 ShowCreateGameMenu();
-                Debug.Log("VR Button pressed: OPEN CREATE MENU");
                 break;
 
             case ButtonAction.JoinGame:
                 JoinGame();
-                Debug.Log("VR Button pressed: JOIN GAME");
                 break;
 
             case ButtonAction.SelectOnePlayer:
                 SelectPlayerCount(1);
-                Debug.Log("VR Button pressed: SELECT 1 PLAYER");
                 break;
 
             case ButtonAction.SelectTwoPlayers:
                 SelectPlayerCount(2);
-                Debug.Log("VR Button pressed: SELECT 2 PLAYERS");
                 break;
 
             case ButtonAction.SelectThreePlayers:
                 SelectPlayerCount(3);
-                Debug.Log("VR Button pressed: SELECT 3 PLAYERS");
                 break;
 
             case ButtonAction.BackToMainMenu:
                 ShowMainMenu();
-                Debug.Log("VR Button pressed: BACK TO MAIN MENU");
                 break;
 
             case ButtonAction.ConfirmCreateGame:
                 ConfirmCreateGame();
-                Debug.Log("VR Button pressed: CONFIRM CREATE GAME");
                 break;
         }
     }
@@ -204,19 +240,14 @@ public class VRPhysicalButton : MonoBehaviour
             createGameMenuRoot.SetActive(true);
         }
 
-        int selectedPlayers = 3;
-
         if (questNetworkInput != null)
         {
-            selectedPlayers = questNetworkInput.selectedPlayerCount;
+            SetMenuStatus("Selected Players: " + questNetworkInput.selectedPlayerCount);
         }
-
-        SetMenuStatus(
-            "CREATE GAME\n\n" +
-            "Selected Players: " + selectedPlayers + "\n\n" +
-            "Choose 1, 2 or 3 players.\n" +
-            "Then press CREATE."
-        );
+        else
+        {
+            SetMenuStatus("Select player count.");
+        }
     }
 
     private void ShowMainMenu()
@@ -231,7 +262,7 @@ public class VRPhysicalButton : MonoBehaviour
             createGameMenuRoot.SetActive(false);
         }
 
-        SetMenuStatus("Choose CREATE GAME or JOIN GAME.");
+        SetMenuStatus("Create Game or Join Game");
     }
 
     private void SelectPlayerCount(int playerCount)
@@ -244,11 +275,7 @@ public class VRPhysicalButton : MonoBehaviour
 
         questNetworkInput.selectedPlayerCount = Mathf.Clamp(playerCount, 1, 3);
 
-        SetMenuStatus(
-            "Selected Players: " + questNetworkInput.selectedPlayerCount + "\n\n" +
-            "Press CREATE to start the game.\n" +
-            "Press BACK to return."
-        );
+        SetMenuStatus("Selected Players: " + questNetworkInput.selectedPlayerCount);
     }
 
     private void ConfirmCreateGame()
@@ -266,6 +293,16 @@ public class VRPhysicalButton : MonoBehaviour
         );
 
         questNetworkInput.StartQuestHost();
+
+        if (mainMenuRoot != null)
+        {
+            mainMenuRoot.SetActive(false);
+        }
+
+        if (createGameMenuRoot != null)
+        {
+            createGameMenuRoot.SetActive(false);
+        }
     }
 
     private void JoinGame()
@@ -279,11 +316,21 @@ public class VRPhysicalButton : MonoBehaviour
         SetMenuStatus("Joining game...");
 
         questNetworkInput.JoinQuestHost();
+
+        if (mainMenuRoot != null)
+        {
+            mainMenuRoot.SetActive(false);
+        }
+
+        if (createGameMenuRoot != null)
+        {
+            createGameMenuRoot.SetActive(false);
+        }
     }
 
     private void SetMenuStatus(string message)
     {
-        Debug.Log("[VRPhysicalButton] " + message);
+        Debug.Log(message);
 
         if (menuStatusText != null)
         {
@@ -291,122 +338,44 @@ public class VRPhysicalButton : MonoBehaviour
         }
     }
 
-    private void ToggleHelpPaper()
+    private void ToggleObject(GameObject target)
     {
-        if (helpPaper == null)
+        if (target != null)
         {
-            Debug.LogWarning("VRPhysicalButton: Help/Paper target is not assigned.");
-            return;
+            target.SetActive(!target.activeSelf);
         }
-
-        helpPaper.SetActive(!helpPaper.activeSelf);
     }
 
-    private void ClosePaper()
+    private void ClosePapers()
     {
-        if (helpPaper == null)
+        if (helpPaperRoot != null)
         {
-            Debug.LogWarning("VRPhysicalButton: Help/Paper target is not assigned.");
-            return;
+            helpPaperRoot.SetActive(false);
         }
 
-        helpPaper.SetActive(false);
+        if (settingsPaperRoot != null)
+        {
+            settingsPaperRoot.SetActive(false);
+        }
     }
 
     private void ToggleMusic()
     {
-        VRMusicSettings settings = GetMusicSettings();
-
-        if (settings == null)
+        if (musicAudioSource == null)
         {
-            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings assigned.");
             return;
         }
 
-        settings.ToggleMusic();
+        musicAudioSource.mute = !musicAudioSource.mute;
     }
 
-    private void ChangeMusicVolumeDown()
+    private void ChangeMusicVolume(float amount)
     {
-        VRMusicSettings settings = GetMusicSettings();
-
-        if (settings == null)
+        if (musicAudioSource == null)
         {
-            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings assigned.");
             return;
         }
 
-        settings.DecreaseMusicVolume();
-    }
-
-    private void ChangeMusicVolumeUp()
-    {
-        VRMusicSettings settings = GetMusicSettings();
-
-        if (settings == null)
-        {
-            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings assigned.");
-            return;
-        }
-
-        settings.IncreaseMusicVolume();
-    }
-
-    private VRMusicSettings GetMusicSettings()
-    {
-        if (musicSettings != null)
-        {
-            return musicSettings;
-        }
-
-        return FindFirstObjectByType<VRMusicSettings>();
-    }
-
-    private IEnumerator RestartToMainMenuRoutine()
-    {
-        yield return new WaitForSeconds(0.15f);
-
-        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-        {
-            NetworkManager.Singleton.Shutdown();
-            yield return new WaitForSeconds(0.25f);
-        }
-
-        Time.timeScale = 1f;
-
-        Scene activeScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(activeScene.name);
-    }
-
-    private void PlayButtonAnimation()
-    {
-        if (pressAnimationCoroutine != null)
-        {
-            StopCoroutine(pressAnimationCoroutine);
-        }
-
-        pressAnimationCoroutine = StartCoroutine(PlayPressAnimation());
-    }
-
-    private bool IsControllerOrHand(GameObject obj)
-    {
-        string objectName = obj.name.ToLower();
-
-        return objectName.Contains("controller") ||
-               objectName.Contains("hand");
-    }
-
-    private IEnumerator PlayPressAnimation()
-    {
-        transform.localScale = new Vector3(
-            originalScale.x * pressedScaleMultiplier.x,
-            originalScale.y * pressedScaleMultiplier.y,
-            originalScale.z * pressedScaleMultiplier.z
-        );
-
-        yield return new WaitForSeconds(pressAnimationTime);
-
-        transform.localScale = originalScale;
-        pressAnimationCoroutine = null;
+        musicAudioSource.volume = Mathf.Clamp01(musicAudioSource.volume + amount);
     }
 }
