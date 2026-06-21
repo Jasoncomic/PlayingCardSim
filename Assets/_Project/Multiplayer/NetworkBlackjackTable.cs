@@ -18,6 +18,13 @@ public class NetworkBlackjackTable : NetworkBehaviour
     public TMP_Text statusText;
     public GameObject newGameButtonRoot;
 
+    [Header("Audio")]
+    public AudioSource sfxAudioSource;
+    public AudioClip gunshotClip;
+
+    [Range(0f, 1f)]
+    public float gunshotVolume = 1f;
+
     [Header("Game Setup")]
     [Range(1, 3)]
     public int configuredPlayerCount = 3;
@@ -46,6 +53,11 @@ public class NetworkBlackjackTable : NetworkBehaviour
     private void Awake()
     {
         CacheNormalStatusTextStyle();
+
+        if (newGameButtonRoot != null)
+        {
+            newGameButtonRoot.SetActive(false);
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -358,7 +370,21 @@ public class NetworkBlackjackTable : NetworkBehaviour
             SetPlayerCardsShown(i, true);
         }
 
+        int dealerHpBeforeResolve = game.Dealer.Hp;
+
+        int[] playerHeartsBeforeResolve = new int[game.Players.Count];
+
+        for (int i = 0; i < game.Players.Count; i++)
+        {
+            playerHeartsBeforeResolve[i] = game.Players[i].Hearts;
+        }
+
         game.ResolveRound();
+
+        if (DidAnyLifeChange(dealerHpBeforeResolve, playerHeartsBeforeResolve))
+        {
+            PlayGunshotClientRpc();
+        }
 
         if (game.PlayersHaveWon())
         {
@@ -377,6 +403,34 @@ public class NetworkBlackjackTable : NetworkBehaviour
         }
 
         SendStatusToAll(GetRoundStatusBody());
+    }
+
+    private bool DidAnyLifeChange(int dealerHpBeforeResolve, int[] playerHeartsBeforeResolve)
+    {
+        if (game == null)
+        {
+            return false;
+        }
+
+        if (game.Dealer.Hp < dealerHpBeforeResolve)
+        {
+            return true;
+        }
+
+        for (int i = 0; i < game.Players.Count; i++)
+        {
+            if (i >= playerHeartsBeforeResolve.Length)
+            {
+                continue;
+            }
+
+            if (game.Players[i].Hearts < playerHeartsBeforeResolve[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool HasPlayerCardsShown(int playerIndex)
@@ -554,6 +608,24 @@ public class NetworkBlackjackTable : NetworkBehaviour
         {
             newGameButtonRoot.SetActive(visible);
         }
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void PlayGunshotClientRpc()
+    {
+        if (gunshotClip == null)
+        {
+            Debug.LogWarning("NetworkBlackjackTable: No gunshot clip assigned.");
+            return;
+        }
+
+        if (sfxAudioSource != null)
+        {
+            sfxAudioSource.PlayOneShot(gunshotClip, gunshotVolume);
+            return;
+        }
+
+        AudioSource.PlayClipAtPoint(gunshotClip, transform.position, gunshotVolume);
     }
 
     [Rpc(SendTo.ClientsAndHost)]

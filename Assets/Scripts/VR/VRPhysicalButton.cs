@@ -10,6 +10,7 @@ public class VRPhysicalButton : MonoBehaviour
         NewRound,
 
         HelpToggle,
+        SettingsToggle,
         MainMenu,
         Music,
         ClosePaper,
@@ -225,6 +226,11 @@ public class VRPhysicalButton : MonoBehaviour
             case ButtonAction.ConfirmCreateGame:
                 ConfirmCreateGame();
                 break;
+
+            case ButtonAction.SettingsToggle:
+                ToggleObject(settingsPaperRoot);
+                break;
+
         }
     }
 
@@ -294,15 +300,7 @@ public class VRPhysicalButton : MonoBehaviour
 
         questNetworkInput.StartQuestHost();
 
-        if (mainMenuRoot != null)
-        {
-            mainMenuRoot.SetActive(false);
-        }
-
-        if (createGameMenuRoot != null)
-        {
-            createGameMenuRoot.SetActive(false);
-        }
+   
     }
 
     private void JoinGame()

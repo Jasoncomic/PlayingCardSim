@@ -1287,7 +1287,7 @@ GameObject:
   - component: {fileID: 96281225}
   - component: {fileID: 96281224}
   m_Layer: 0
-  m_Name: ButtoonSettings
+  m_Name: ButtonSettings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1321,14 +1321,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 3
-  networkBlackjackTable: {fileID: 0}
-  questNetworkInput: {fileID: 0}
-  mainMenuRoot: {fileID: 0}
-  createGameMenuRoot: {fileID: 0}
-  menuStatusText: {fileID: 0}
-  helpPaperRoot: {fileID: 0}
-  settingsPaperRoot: {fileID: 0}
+  action: 4
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaperRoot: {fileID: 2085162143}
+  settingsPaperRoot: {fileID: 1729612487}
   musicAudioSource: {fileID: 0}
   volumeStep: 0.1
   visualTarget: {fileID: 0}
@@ -1350,7 +1350,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -4449,7 +4449,7 @@ GameObject:
   m_Component:
   - component: {fileID: 315928640}
   m_Layer: 0
-  m_Name: SettinghsPaperRoot
+  m_Name: SettingsPaperRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8824,7 +8824,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -8900,13 +8900,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
   action: 3
-  networkBlackjackTable: {fileID: 0}
-  questNetworkInput: {fileID: 0}
-  mainMenuRoot: {fileID: 0}
-  createGameMenuRoot: {fileID: 0}
-  menuStatusText: {fileID: 0}
-  helpPaperRoot: {fileID: 0}
-  settingsPaperRoot: {fileID: 0}
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
+  mainMenuRoot: {fileID: 568536879}
+  createGameMenuRoot: {fileID: 1112688808}
+  menuStatusText: {fileID: 1164673498}
+  helpPaperRoot: {fileID: 2085162143}
+  settingsPaperRoot: {fileID: 315928639}
   musicAudioSource: {fileID: 0}
   volumeStep: 0.1
   visualTarget: {fileID: 0}
@@ -17272,6 +17272,7 @@ GameObject:
   - component: {fileID: 1279361255}
   - component: {fileID: 1279361254}
   - component: {fileID: 1279361256}
+  - component: {fileID: 1279361257}
   m_Layer: 0
   m_Name: Network Blackjack Table
   m_TagString: Untagged
@@ -17339,7 +17340,107 @@ MonoBehaviour:
   dealerSpawn: {fileID: 1552127001}
   statusText: {fileID: 1164673498}
   newGameButtonRoot: {fileID: 290371168}
+  sfxAudioSource: {fileID: 1279361257}
+  gunshotClip: {fileID: 8300000, guid: 075fd05ba070c0241895739d741bf5be, type: 3}
+  gunshotVolume: 1
   configuredPlayerCount: 1
+--- !u!82 &1279361257
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1279361253}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1279638635
 GameObject:
   m_ObjectHideFlags: 0
@@ -23775,7 +23876,7 @@ Transform:
   m_GameObject: {fileID: 1729612487}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20.56357, y: -6.87187, z: 1.82406}
+  m_LocalPosition: {x: 2.55, y: -19.217, z: 13.354}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
