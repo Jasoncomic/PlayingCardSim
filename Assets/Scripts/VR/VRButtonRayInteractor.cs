@@ -9,7 +9,12 @@ public class VRButtonRayInteractor : MonoBehaviour
     public float maxDistance = 5.0f;
     public float maxPressDistance = 1.0f;
 
+    [Header("Click Outside Closes Papers")]
+    public GameObject[] closeWhenClickOutside;
+
     private VRPhysicalButton currentTarget;
+    private RaycastHit currentHit;
+    private bool hasHit;
 
     private void Update()
     {
@@ -22,13 +27,14 @@ public class VRButtonRayInteractor : MonoBehaviour
 
         if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
         {
-            PressCurrentTarget();
+            HandleTriggerPressed();
         }
     }
 
     private void UpdateCurrentTarget()
     {
         currentTarget = null;
+        hasHit = false;
 
         Vector3 start = rightControllerTransform.position;
         Vector3 direction = rightControllerTransform.forward;
@@ -41,6 +47,9 @@ public class VRButtonRayInteractor : MonoBehaviour
                 ~0,
                 QueryTriggerInteraction.Collide))
         {
+            hasHit = true;
+            currentHit = hit;
+
             VRPhysicalButton button = hit.collider.GetComponent<VRPhysicalButton>();
 
             if (button == null)
@@ -52,16 +61,104 @@ public class VRButtonRayInteractor : MonoBehaviour
         }
     }
 
-    private void PressCurrentTarget()
+    private void HandleTriggerPressed()
     {
+        bool anyPaperOpen = AnyClosablePaperOpen();
+
+        if (anyPaperOpen)
+        {
+            bool clickInsidePaper = IsRayHitInsideAnyOpenPaper();
+
+            if (clickInsidePaper)
+            {
+                if (currentTarget != null)
+                {
+                    PressCurrentTarget();
+                }
+
+                return;
+            }
+
+            CloseAllClosablePapers();
+            Debug.Log("Clicked outside paper. Closed open papers.");
+            return;
+        }
+
         if (currentTarget != null)
         {
-            currentTarget.PressButton();
-            Debug.Log("Ray pressed button: " + currentTarget.gameObject.name);
+            PressCurrentTarget();
             return;
         }
 
         PressNearestButtonFallback();
+    }
+
+    private void PressCurrentTarget()
+    {
+        currentTarget.PressButton();
+        Debug.Log("Ray pressed button: " + currentTarget.gameObject.name);
+    }
+
+    private bool AnyClosablePaperOpen()
+    {
+        if (closeWhenClickOutside == null)
+        {
+            return false;
+        }
+
+        foreach (GameObject paper in closeWhenClickOutside)
+        {
+            if (paper != null && paper.activeInHierarchy)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsRayHitInsideAnyOpenPaper()
+    {
+        if (!hasHit || currentHit.collider == null)
+        {
+            return false;
+        }
+
+        if (closeWhenClickOutside == null)
+        {
+            return false;
+        }
+
+        foreach (GameObject paper in closeWhenClickOutside)
+        {
+            if (paper == null || !paper.activeInHierarchy)
+            {
+                continue;
+            }
+
+            if (currentHit.collider.transform.IsChildOf(paper.transform))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void CloseAllClosablePapers()
+    {
+        if (closeWhenClickOutside == null)
+        {
+            return;
+        }
+
+        foreach (GameObject paper in closeWhenClickOutside)
+        {
+            if (paper != null)
+            {
+                paper.SetActive(false);
+            }
+        }
     }
 
     private void PressNearestButtonFallback()

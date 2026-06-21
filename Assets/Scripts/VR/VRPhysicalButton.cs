@@ -12,13 +12,14 @@ public class VRPhysicalButton : MonoBehaviour
         NewRound,
         HelpToggle,
         MainMenu,
-        Music
+        Music,
+        ClosePaper
     }
 
     [Header("References")]
     public NetworkBlackjackTable networkBlackjackTable;
 
-    [Header("Help Paper")]
+    [Header("Help / Paper Target")]
     public GameObject helpPaper;
     public bool helpPaperStartsHidden = true;
 
@@ -32,6 +33,7 @@ public class VRPhysicalButton : MonoBehaviour
 
     private Vector3 originalScale;
     private float lastPressTime = -999f;
+    private Coroutine pressAnimationCoroutine;
 
     private void Awake()
     {
@@ -65,11 +67,18 @@ public class VRPhysicalButton : MonoBehaviour
 
         lastPressTime = Time.time;
 
+        PlayButtonAnimation();
+
         switch (action)
         {
             case ButtonAction.HelpToggle:
                 ToggleHelpPaper();
-                Debug.Log("VR Button pressed: HELP");
+                Debug.Log("VR Button pressed: HELP / SETTINGS TOGGLE");
+                break;
+
+            case ButtonAction.ClosePaper:
+                ClosePaper();
+                Debug.Log("VR Button pressed: CLOSE PAPER");
                 break;
 
             case ButtonAction.MainMenu:
@@ -114,20 +123,28 @@ public class VRPhysicalButton : MonoBehaviour
                 Debug.Log("VR Button pressed: NEW ROUND");
                 break;
         }
-
-        StopAllCoroutines();
-        StartCoroutine(PlayPressAnimation());
     }
 
     private void ToggleHelpPaper()
     {
         if (helpPaper == null)
         {
-            Debug.LogWarning("VRPhysicalButton: Help Paper is not assigned.");
+            Debug.LogWarning("VRPhysicalButton: Help/Paper target is not assigned.");
             return;
         }
 
         helpPaper.SetActive(!helpPaper.activeSelf);
+    }
+
+    private void ClosePaper()
+    {
+        if (helpPaper == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: Help/Paper target is not assigned.");
+            return;
+        }
+
+        helpPaper.SetActive(false);
     }
 
     private IEnumerator RestartToMainMenuRoutine()
@@ -144,6 +161,16 @@ public class VRPhysicalButton : MonoBehaviour
 
         Scene activeScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(activeScene.name);
+    }
+
+    private void PlayButtonAnimation()
+    {
+        if (pressAnimationCoroutine != null)
+        {
+            StopCoroutine(pressAnimationCoroutine);
+        }
+
+        pressAnimationCoroutine = StartCoroutine(PlayPressAnimation());
     }
 
     private bool IsControllerOrHand(GameObject obj)
@@ -165,5 +192,6 @@ public class VRPhysicalButton : MonoBehaviour
         yield return new WaitForSeconds(pressAnimationTime);
 
         transform.localScale = originalScale;
+        pressAnimationCoroutine = null;
     }
 }
