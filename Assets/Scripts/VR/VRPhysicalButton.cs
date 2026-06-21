@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 public class VRPhysicalButton : MonoBehaviour
 {
@@ -8,7 +10,9 @@ public class VRPhysicalButton : MonoBehaviour
         Hit,
         Stand,
         NewRound,
-        HelpToggle
+        HelpToggle,
+        MainMenu,
+        Music
     }
 
     [Header("References")]
@@ -68,6 +72,15 @@ public class VRPhysicalButton : MonoBehaviour
                 Debug.Log("VR Button pressed: HELP");
                 break;
 
+            case ButtonAction.MainMenu:
+                Debug.Log("VR Button pressed: MAIN MENU");
+                StartCoroutine(RestartToMainMenuRoutine());
+                break;
+
+            case ButtonAction.Music:
+                Debug.Log("VR Button pressed: MUSIC - no action yet.");
+                break;
+
             case ButtonAction.Hit:
                 if (networkBlackjackTable == null)
                 {
@@ -115,6 +128,22 @@ public class VRPhysicalButton : MonoBehaviour
         }
 
         helpPaper.SetActive(!helpPaper.activeSelf);
+    }
+
+    private IEnumerator RestartToMainMenuRoutine()
+    {
+        yield return new WaitForSeconds(0.15f);
+
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+        {
+            NetworkManager.Singleton.Shutdown();
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        Time.timeScale = 1f;
+
+        Scene activeScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(activeScene.name);
     }
 
     private bool IsControllerOrHand(GameObject obj)
