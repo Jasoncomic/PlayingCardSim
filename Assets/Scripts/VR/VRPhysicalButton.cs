@@ -13,7 +13,9 @@ public class VRPhysicalButton : MonoBehaviour
         HelpToggle,
         MainMenu,
         Music,
-        ClosePaper
+        ClosePaper,
+        MusicVolumeDown,
+        MusicVolumeUp
     }
 
     [Header("References")]
@@ -22,6 +24,9 @@ public class VRPhysicalButton : MonoBehaviour
     [Header("Help / Paper Target")]
     public GameObject helpPaper;
     public bool helpPaperStartsHidden = true;
+
+    [Header("Music Settings")]
+    public VRMusicSettings musicSettings;
 
     [Header("Button Settings")]
     public ButtonAction action;
@@ -87,7 +92,18 @@ public class VRPhysicalButton : MonoBehaviour
                 break;
 
             case ButtonAction.Music:
-                Debug.Log("VR Button pressed: MUSIC - no action yet.");
+                ToggleMusic();
+                Debug.Log("VR Button pressed: MUSIC TOGGLE");
+                break;
+
+            case ButtonAction.MusicVolumeDown:
+                ChangeMusicVolumeDown();
+                Debug.Log("VR Button pressed: MUSIC VOLUME DOWN");
+                break;
+
+            case ButtonAction.MusicVolumeUp:
+                ChangeMusicVolumeUp();
+                Debug.Log("VR Button pressed: MUSIC VOLUME UP");
                 break;
 
             case ButtonAction.Hit:
@@ -145,6 +161,55 @@ public class VRPhysicalButton : MonoBehaviour
         }
 
         helpPaper.SetActive(false);
+    }
+
+    private void ToggleMusic()
+    {
+        VRMusicSettings settings = GetMusicSettings();
+
+        if (settings == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings assigned.");
+            return;
+        }
+
+        settings.ToggleMusic();
+    }
+
+    private void ChangeMusicVolumeDown()
+    {
+        VRMusicSettings settings = GetMusicSettings();
+
+        if (settings == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings assigned.");
+            return;
+        }
+
+        settings.DecreaseMusicVolume();
+    }
+
+    private void ChangeMusicVolumeUp()
+    {
+        VRMusicSettings settings = GetMusicSettings();
+
+        if (settings == null)
+        {
+            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings assigned.");
+            return;
+        }
+
+        settings.IncreaseMusicVolume();
+    }
+
+    private VRMusicSettings GetMusicSettings()
+    {
+        if (musicSettings != null)
+        {
+            return musicSettings;
+        }
+
+        return FindFirstObjectByType<VRMusicSettings>();
     }
 
     private IEnumerator RestartToMainMenuRoutine()
