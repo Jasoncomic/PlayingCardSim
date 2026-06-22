@@ -9,7 +9,7 @@ public class VRPhysicalButton : MonoBehaviour
         Stand,
         NewRound,
 
-        HelpToggle,
+    HelpToggle,
         SettingsToggle,
         MainMenu,
         Music,
@@ -45,7 +45,9 @@ public class VRPhysicalButton : MonoBehaviour
     public GameObject settingsPaperRoot;
 
     [Header("Music")]
+    public VRMusicSettings musicSettings;
     public AudioSource musicAudioSource;
+
     [Range(0f, 1f)]
     public float volumeStep = 0.1f;
 
@@ -179,6 +181,10 @@ public class VRPhysicalButton : MonoBehaviour
                 ToggleObject(helpPaperRoot);
                 break;
 
+            case ButtonAction.SettingsToggle:
+                ToggleObject(settingsPaperRoot);
+                break;
+
             case ButtonAction.MainMenu:
                 ShowMainMenu();
                 break;
@@ -226,11 +232,50 @@ public class VRPhysicalButton : MonoBehaviour
             case ButtonAction.ConfirmCreateGame:
                 ConfirmCreateGame();
                 break;
+        }
+    }
 
-            case ButtonAction.SettingsToggle:
-                ToggleObject(settingsPaperRoot);
-                break;
+    private void ToggleMusic()
+    {
+        if (musicSettings != null)
+        {
+            musicSettings.ToggleMusic();
+            return;
+        }
 
+        if (musicAudioSource != null)
+        {
+            musicAudioSource.mute = !musicAudioSource.mute;
+        }
+        else
+        {
+            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings or AudioSource assigned for music button.");
+        }
+    }
+
+    private void ChangeMusicVolume(float amount)
+    {
+        if (musicSettings != null)
+        {
+            if (amount > 0f)
+            {
+                musicSettings.IncreaseMusicVolume();
+            }
+            else
+            {
+                musicSettings.DecreaseMusicVolume();
+            }
+
+            return;
+        }
+
+        if (musicAudioSource != null)
+        {
+            musicAudioSource.volume = Mathf.Clamp01(musicAudioSource.volume + amount);
+        }
+        else
+        {
+            Debug.LogWarning("VRPhysicalButton: No VRMusicSettings or AudioSource assigned for volume button.");
         }
     }
 
@@ -299,8 +344,6 @@ public class VRPhysicalButton : MonoBehaviour
         );
 
         questNetworkInput.StartQuestHost();
-
-   
     }
 
     private void JoinGame()
@@ -342,6 +385,10 @@ public class VRPhysicalButton : MonoBehaviour
         {
             target.SetActive(!target.activeSelf);
         }
+        else
+        {
+            Debug.LogWarning("VRPhysicalButton: Toggle target is not assigned on " + gameObject.name);
+        }
     }
 
     private void ClosePapers()
@@ -357,23 +404,4 @@ public class VRPhysicalButton : MonoBehaviour
         }
     }
 
-    private void ToggleMusic()
-    {
-        if (musicAudioSource == null)
-        {
-            return;
-        }
-
-        musicAudioSource.mute = !musicAudioSource.mute;
-    }
-
-    private void ChangeMusicVolume(float amount)
-    {
-        if (musicAudioSource == null)
-        {
-            return;
-        }
-
-        musicAudioSource.volume = Mathf.Clamp01(musicAudioSource.volume + amount);
-    }
 }

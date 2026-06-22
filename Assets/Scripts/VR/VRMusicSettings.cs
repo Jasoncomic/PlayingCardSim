@@ -6,6 +6,11 @@ public class VRMusicSettings : MonoBehaviour
     private const string MusicEnabledKey = "MusicEnabled";
     private const string MusicVolumeKey = "MusicVolume";
 
+    [Header("Audio")]
+    public AudioSource musicAudioSource;
+    public bool findMusicManagerAutomatically = true;
+    public bool alwaysStartMusicOn = true;
+
     [Header("UI Texts")]
     public TMP_Text musicToggleText;
     public TMP_Text musicVolumeText;
@@ -20,9 +25,22 @@ public class VRMusicSettings : MonoBehaviour
     private bool musicEnabled = true;
     private float musicVolume = 0.35f;
 
+    private void Awake()
+    {
+        FindMusicAudioSourceIfNeeded();
+    }
+
     private void Start()
     {
         LoadSettings();
+
+        if (alwaysStartMusicOn)
+        {
+            musicEnabled = true;
+            PlayerPrefs.SetInt(MusicEnabledKey, 1);
+            PlayerPrefs.Save();
+        }
+
         ApplyMusicSettings();
         RefreshTexts();
     }
@@ -70,23 +88,62 @@ public class VRMusicSettings : MonoBehaviour
         musicVolume = Mathf.Clamp01(musicVolume);
     }
 
+    private void FindMusicAudioSourceIfNeeded()
+    {
+        if (musicAudioSource != null)
+        {
+            return;
+        }
+
+        if (!findMusicManagerAutomatically)
+        {
+            return;
+        }
+
+        GameObject musicManagerObject = GameObject.Find("MusicManager");
+
+        if (musicManagerObject != null)
+        {
+            musicAudioSource = musicManagerObject.GetComponent<AudioSource>();
+        }
+
+        if (musicAudioSource == null)
+        {
+            Debug.LogWarning("VRMusicSettings: No AudioSource found. Drag MusicManager AudioSource into Music Audio Source.");
+        }
+    }
+
     private void ApplyMusicSettings()
     {
-        if (MusicManager.Instance == null)
+        FindMusicAudioSourceIfNeeded();
+
+        if (musicAudioSource == null)
         {
-            Debug.LogWarning("VRMusicSettings: MusicManager not found in scene.");
+            Debug.LogWarning("VRMusicSettings: Music Audio Source is missing.");
             return;
         }
 
         if (musicEnabled)
         {
-            MusicManager.Instance.PlayMusic();
-            MusicManager.Instance.SetVolume(musicVolume);
+            musicAudioSource.mute = false;
+            musicAudioSource.volume = musicVolume;
+
+            if (musicAudioSource.clip == null)
+            {
+                Debug.LogWarning("VRMusicSettings: AudioSource has no music clip.");
+                return;
+            }
+
+            if (!musicAudioSource.isPlaying)
+            {
+                musicAudioSource.Play();
+            }
         }
         else
         {
-            MusicManager.Instance.SetVolume(0f);
-            MusicManager.Instance.StopMusic();
+            musicAudioSource.Stop();
+            musicAudioSource.mute = true;
+            musicAudioSource.volume = 0f;
         }
     }
 
