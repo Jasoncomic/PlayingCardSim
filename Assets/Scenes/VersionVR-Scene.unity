@@ -1328,7 +1328,7 @@ MonoBehaviour:
   createGameMenuRoot: {fileID: 1112688808}
   menuStatusText: {fileID: 1164673498}
   helpPaperRoot: {fileID: 2085162143}
-  settingsPaperRoot: {fileID: 1729612487}
+  settingsPaperRoot: {fileID: 315928639}
   musicAudioSource: {fileID: 0}
   volumeStep: 0.1
   visualTarget: {fileID: 0}
@@ -3073,9 +3073,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 7
-  networkBlackjackTable: {fileID: 0}
-  questNetworkInput: {fileID: 0}
+  action: 8
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 0}
   createGameMenuRoot: {fileID: 0}
   menuStatusText: {fileID: 0}
@@ -3530,7 +3530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 16
+  action: 17
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -7162,7 +7162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 15
+  action: 16
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -8682,9 +8682,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 8
-  networkBlackjackTable: {fileID: 0}
-  questNetworkInput: {fileID: 0}
+  action: 9
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 0}
   createGameMenuRoot: {fileID: 0}
   menuStatusText: {fileID: 0}
@@ -13658,7 +13658,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 10
+  action: 11
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -14590,7 +14590,7 @@ MonoBehaviour:
   unityTransport: {fileID: 545293069}
   networkBlackjackTable: {fileID: 1279361256}
   statusText: {fileID: 1164673498}
-  defaultHostIp: 192.168.0.200
+  defaultHostIp: 10.83.161.51
   port: 7777
   selectedPlayerCount: 2
   joinIpLastNumber: 220
@@ -18904,9 +18904,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 5
-  networkBlackjackTable: {fileID: 0}
-  questNetworkInput: {fileID: 0}
+  action: 6
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 0}
   createGameMenuRoot: {fileID: 0}
   menuStatusText: {fileID: 0}
@@ -19937,7 +19937,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 9
+  action: 10
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -20737,7 +20737,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 11
+  action: 12
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -23019,7 +23019,7 @@ Transform:
   m_GameObject: {fileID: 1665361332}
   serializedVersion: 2
   m_LocalRotation: {x: -0.122787856, y: 0.6963643, z: 0.122787856, w: 0.6963643}
-  m_LocalPosition: {x: -2.51, y: -20.4, z: 15.602}
+  m_LocalPosition: {x: -2.664, y: -20.456, z: 15.977}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -26014,7 +26014,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 13
+  action: 14
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -26695,7 +26695,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 14
+  action: 15
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -28324,7 +28324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 12
+  action: 13
   networkBlackjackTable: {fileID: 1279361256}
   questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 568536879}
@@ -28952,9 +28952,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b2f609e7f1c42c419f383d9978aa71f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VRPhysicalButton
-  action: 6
-  networkBlackjackTable: {fileID: 0}
-  questNetworkInput: {fileID: 0}
+  action: 7
+  networkBlackjackTable: {fileID: 1279361256}
+  questNetworkInput: {fileID: 1151038785}
   mainMenuRoot: {fileID: 0}
   createGameMenuRoot: {fileID: 0}
   menuStatusText: {fileID: 0}

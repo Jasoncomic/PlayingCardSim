@@ -647,7 +647,14 @@ public class NetworkBlackjackTable : NetworkBehaviour
             return;
         }
 
-        cardDrawer.SpawnCardVisual(card, spawnPoint, cardIndex);
+        CardDrawer.CardOffsetDirection offsetDirection = GetCardOffsetDirection(areaIndex);
+
+        cardDrawer.SpawnCardVisual(
+            card,
+            spawnPoint,
+            cardIndex,
+            offsetDirection
+        );
     }
 
     [Rpc(SendTo.ClientsAndHost)]
@@ -677,6 +684,30 @@ public class NetworkBlackjackTable : NetworkBehaviour
         }
 
         return dealerSpawn;
+    }
+
+    private CardDrawer.CardOffsetDirection GetCardOffsetDirection(int areaIndex)
+    {
+        if (areaIndex == 0)
+        {
+            // Player 1 cards spread on X axis
+            return CardDrawer.CardOffsetDirection.Player1_X;
+        }
+
+        if (areaIndex == 1)
+        {
+            // Player 2 cards spread on negative Z axis
+            return CardDrawer.CardOffsetDirection.Player2_NegativeZ;
+        }
+
+        if (areaIndex == 2)
+        {
+            // Player 3 cards spread on positive Z axis
+            return CardDrawer.CardOffsetDirection.Player3_PositiveZ;
+        }
+
+        // Dealer: keep normal X axis layout
+        return CardDrawer.CardOffsetDirection.Player1_X;
     }
 
     private int GetLocalPlayerIndex()
