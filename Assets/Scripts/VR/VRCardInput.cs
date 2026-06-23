@@ -2,11 +2,17 @@ using UnityEngine;
 
 public class VRCardInput : MonoBehaviour
 {
-    public CardDrawer cardDrawer;
+
+
+public CardDrawer cardDrawer; // verbindet die Controller-Eingaben mit dem CardDrawer
+
+    // =====================================
+    // Eingaben prüfen
+    // =====================================
 
     private void Update()
     {
-        if (cardDrawer == null)
+        if (cardDrawer == null) // bricht ab, wenn kein CardDrawer zugewiesen ist
         {
             return;
         }
@@ -14,7 +20,7 @@ public class VRCardInput : MonoBehaviour
         // A-Button am rechten Quest Controller: Karte ziehen
         if (OVRInput.GetDown(OVRInput.Button.One))
         {
-            cardDrawer.DrawTestCard();
+            cardDrawer.DrawTestCard(); 
         }
 
         // B-Button am rechten Quest Controller: Karten löschen
@@ -23,4 +29,6 @@ public class VRCardInput : MonoBehaviour
             cardDrawer.ClearSpawnedCards();
         }
     }
+
+
 }

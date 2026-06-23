@@ -3,23 +3,36 @@ using BlackJackBattleTest;
 
 public class VRBlackjackTestInput : MonoBehaviour
 {
-    [Header("References")]
-    public CardDrawer cardDrawer;
-    public Transform playerSpawn;
-    public Transform dealerSpawn;
 
-    private Deck deck;
-    private int playerCardCount = 0;
-    private int dealerCardCount = 0;
+[Header("References")]
+    public CardDrawer cardDrawer; // zeichnet Testkarten in Szene
+    public Transform playerSpawn; // Position für Spielerkarten
+    public Transform dealerSpawn; // Position für Dealerkarten
+
+    // =====================================
+    // Testkarten-Zustand
+    // =====================================
+
+    private Deck deck; // Test-Kartendeck
+    private int playerCardCount = 0; // zählt gezogene Spielerkarten
+    private int dealerCardCount = 0; // zählt gezogene Dealerkarten
+
+    // =====================================
+    // Start
+    // =====================================
 
     private void Start()
     {
-        deck = new Deck();
+        deck = new Deck(); // erstellt ein neues Testdeck
     }
+
+    // =====================================
+    // Eingaben prüfen
+    // =====================================
 
     private void Update()
     {
-        if (cardDrawer == null)
+        if (cardDrawer == null) // bricht ab, wenn kein CardDrawer zugewiesen ist
         {
             return;
         }
@@ -37,6 +50,10 @@ public class VRBlackjackTestInput : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Spieler-Testkarte ziehen
+    // =====================================
+
     private void DrawPlayerCard()
     {
         if (deck == null)
@@ -51,6 +68,10 @@ public class VRBlackjackTestInput : MonoBehaviour
         Debug.Log("Player drew: " + card);
     }
 
+    // =====================================
+    // Dealer-Testkarte ziehen
+    // =====================================
+
     private void DrawDealerCard()
     {
         if (deck == null)
@@ -64,4 +85,6 @@ public class VRBlackjackTestInput : MonoBehaviour
 
         Debug.Log("Dealer drew: " + card);
     }
+
+
 }

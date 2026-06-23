@@ -6,36 +6,57 @@ using BlackJackBattleTest;
 
 public class VRBlackjackController : MonoBehaviour
 {
-    [Header("References")]
-    public VRCardDrawer cardDrawer;
+// =====================================
+// Referenzen
+// =====================================
+
+
+[Header("References")]
+    public VRCardDrawer cardDrawer; // zeichnet und platziert die Karten im VR-Raum
 
     [Header("VR UI")]
-    public TMP_Text resultText;
+    public TMP_Text resultText; // zeigt Ergebnis und Spielstatus an
 
     [Header("Timing")]
-    public float dealerDrawDelay = 1.5f;
+    public float dealerDrawDelay = 1.5f; // Wartezeit zwischen Dealer-Aktionen
 
-    private Deck deck;
+    // =====================================
+    // Karten und Hände
+    // =====================================
 
-    private readonly List<Card> playerHand = new List<Card>();
-    private readonly List<Card> dealerHand = new List<Card>();
+    private Deck deck; // aktuelles Kartendeck
 
-    private GameObject hiddenDealerCardObject;
+    private readonly List<Card> playerHand = new List<Card>(); // Karten des Spielers
+    private readonly List<Card> dealerHand = new List<Card>(); // Karten des Dealers
 
-    private bool roundOver = false;
-    private bool dealerHiddenCardRevealed = false;
-    private bool dealerIsPlaying = false;
+    private GameObject hiddenDealerCardObject; // verdeckte Dealer-Karte als Objekt in der Szene
+
+    // =====================================
+    // Rundenstatus
+    // =====================================
+
+    private bool roundOver = false; // merkt sich, ob die Runde beendet ist
+    private bool dealerHiddenCardRevealed = false; // merkt sich, ob die verdeckte Dealer-Karte aufgedeckt wurde
+    private bool dealerIsPlaying = false; // verhindert Eingaben, während der Dealer spielt
+
+    // =====================================
+    // Start
+    // =====================================
 
     private void Start()
     {
-        StartNewRound();
+        StartNewRound(); // startet beim Szenenstart direkt eine neue Runde
     }
+
+    // =====================================
+    // Neue Runde starten
+    // =====================================
 
     public void StartNewRound()
     {
-        StopAllCoroutines();
+        StopAllCoroutines(); // stoppt alte Dealer-Abläufe
 
-        deck = new Deck();
+        deck = new Deck(); // erstellt ein neues Deck
 
         playerHand.Clear();
         dealerHand.Clear();
@@ -47,7 +68,7 @@ public class VRBlackjackController : MonoBehaviour
 
         if (cardDrawer != null)
         {
-            cardDrawer.ClearCards();
+            cardDrawer.ClearCards(); // entfernt alte Karten aus der Szene
         }
 
         SetResultText("");
@@ -66,19 +87,23 @@ public class VRBlackjackController : MonoBehaviour
         Debug.Log("Dealer visible value: " + CalculateVisibleDealerValue());
     }
 
+    // =====================================
+    // Spieler zieht Karte
+    // =====================================
+
     public void PlayerHit()
     {
-        if (roundOver || dealerIsPlaying)
+        if (roundOver || dealerIsPlaying) // verhindert Hit nach Rundenende oder während des Dealer-Zugs
         {
             return;
         }
 
         DrawPlayerCard();
 
-        int playerValue = CalculateHandValue(playerHand);
+        int playerValue = CalculateHandValue(playerHand); // berechnet aktuellen Spielerwert
         Debug.Log("Player value: " + playerValue);
 
-        if (playerValue > 21)
+        if (playerValue > 21) // Spieler ist über 21
         {
             SetResultText("Player bust...");
             Debug.Log("Player bust. Dealer reveals and finishes round.");
@@ -86,9 +111,13 @@ public class VRBlackjackController : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Spieler bleibt stehen
+    // =====================================
+
     public void Stand()
     {
-        if (roundOver || dealerIsPlaying)
+        if (roundOver || dealerIsPlaying) // verhindert Stand, wenn die Runde nicht mehr aktiv ist
         {
             return;
         }
@@ -98,10 +127,18 @@ public class VRBlackjackController : MonoBehaviour
         StartCoroutine(DealerTurnRoutine());
     }
 
+    // =====================================
+    // Runde zurücksetzen
+    // =====================================
+
     public void ResetRound()
     {
         StartNewRound();
     }
+
+    // =====================================
+    // Dealer-Zug
+    // =====================================
 
     private IEnumerator DealerTurnRoutine()
     {
@@ -111,7 +148,7 @@ public class VRBlackjackController : MonoBehaviour
 
         yield return new WaitForSeconds(dealerDrawDelay);
 
-        while (CalculateHandValue(dealerHand) < 17)
+        while (CalculateHandValue(dealerHand) < 17) // Dealer zieht bis mindestens 17
         {
             DrawDealerOpenCard();
 
@@ -122,6 +159,10 @@ public class VRBlackjackController : MonoBehaviour
 
         dealerIsPlaying = false;
     }
+
+    // =====================================
+    // Spielerkarte ziehen
+    // =====================================
 
     private void DrawPlayerCard()
     {
@@ -135,11 +176,15 @@ public class VRBlackjackController : MonoBehaviour
 
         if (cardDrawer != null)
         {
-            cardDrawer.SpawnPlayerCard(card, playerHand.Count - 1);
+            cardDrawer.SpawnPlayerCard(card, playerHand.Count - 1); // erzeugt die Karte visuell beim Spieler
         }
 
         Debug.Log("Player drew: " + card);
     }
+
+    // =====================================
+    // Offene Dealer-Karte ziehen
+    // =====================================
 
     private void DrawDealerOpenCard()
     {
@@ -153,11 +198,15 @@ public class VRBlackjackController : MonoBehaviour
 
         if (cardDrawer != null)
         {
-            cardDrawer.SpawnDealerCard(card, dealerHand.Count - 1);
+            cardDrawer.SpawnDealerCard(card, dealerHand.Count - 1); // erzeugt die offene Dealer-Karte
         }
 
         Debug.Log("Dealer drew open card: " + card);
     }
+
+    // =====================================
+    // Verdeckte Dealer-Karte ziehen
+    // =====================================
 
     private void DrawDealerHiddenCard()
     {
@@ -174,11 +223,15 @@ public class VRBlackjackController : MonoBehaviour
             hiddenDealerCardObject = cardDrawer.SpawnHiddenDealerCard(
                 card,
                 dealerHand.Count - 1
-            );
+            ); // erzeugt die verdeckte Dealer-Karte
         }
 
         Debug.Log("Dealer drew hidden card.");
     }
+
+    // =====================================
+    // Verdeckte Dealer-Karte aufdecken
+    // =====================================
 
     private void RevealDealerHiddenCard()
     {
@@ -192,7 +245,7 @@ public class VRBlackjackController : MonoBehaviour
             return;
         }
 
-        Card hiddenCard = dealerHand[1];
+        Card hiddenCard = dealerHand[1]; // zweite Dealer-Karte ist die verdeckte Karte
 
         if (cardDrawer != null)
         {
@@ -205,14 +258,18 @@ public class VRBlackjackController : MonoBehaviour
 
         dealerHiddenCardRevealed = true;
 
-        Debug.Log("Dealer revealed hidden card: " + hiddenCard);
-        Debug.Log("Dealer value: " + CalculateHandValue(dealerHand));
+        Debug.Log("Dealer revealed hidden card: " + hiddenCard); // schreibt aufgedeckte Karte in die Console
+        Debug.Log("Dealer value: " + CalculateHandValue(dealerHand)); // schreibt Dealerwert in die Console
     }
+
+    // =====================================
+    // Runde auswerten
+    // =====================================
 
     private void FinishRound()
     {
-        int playerValue = CalculateHandValue(playerHand);
-        int dealerValue = CalculateHandValue(dealerHand);
+        int playerValue = CalculateHandValue(playerHand); // berechnet finalen Spielerwert
+        int dealerValue = CalculateHandValue(dealerHand); // berechnet finalen Dealerwert
 
         roundOver = true;
 
@@ -245,6 +302,10 @@ public class VRBlackjackController : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Ergebnistext setzen
+    // =====================================
+
     private void SetResultText(string message)
     {
         if (resultText != null)
@@ -258,6 +319,10 @@ public class VRBlackjackController : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Sichtbaren Dealerwert berechnen
+    // =====================================
+
     private int CalculateVisibleDealerValue()
     {
         if (dealerHand.Count == 0)
@@ -265,17 +330,21 @@ public class VRBlackjackController : MonoBehaviour
             return 0;
         }
 
-        return GetCardValue(dealerHand[0]);
+        return GetCardValue(dealerHand[0]); // nur die erste offene Dealer-Karte zählt sichtbar
     }
+
+    // =====================================
+    // Handwert berechnen
+    // =====================================
 
     private int CalculateHandValue(List<Card> hand)
     {
-        int value = 0;
-        int aceCount = 0;
-
+        int value = 0; // aktueller Gesamtwert der Hand
+        int aceCount = 0; 
+         
         foreach (Card card in hand)
         {
-            int cardValue = GetCardValue(card);
+            int cardValue = GetCardValue(card); // berechnet Wert der aktuellen Karte
             value += cardValue;
 
             string rank = card.Rank.ToString().ToLower();
@@ -286,7 +355,7 @@ public class VRBlackjackController : MonoBehaviour
             }
         }
 
-        while (value > 21 && aceCount > 0)
+        while (value > 21 && aceCount > 0) // Ass wird von 11 auf 1 reduziert
         {
             value -= 10;
             aceCount--;
@@ -295,9 +364,13 @@ public class VRBlackjackController : MonoBehaviour
         return value;
     }
 
+    // =====================================
+    // Kartenwert bestimmen
+    // =====================================
+
     private int GetCardValue(Card card)
     {
-        string rank = card.Rank.ToString().ToLower();
+        string rank = card.Rank.ToString().ToLower(); // wandelt den Kartenrang in Kleinbuchstaben um
 
         if (rank == "ace" || rank == "a")
         {
@@ -320,12 +393,12 @@ public class VRBlackjackController : MonoBehaviour
         if (rank == "three") return 3;
         if (rank == "two") return 2;
 
-        if (int.TryParse(rank, out int numericValue))
+        if (int.TryParse(rank, out int numericValue)) // versucht numerische Kartenwerte direkt zu lesen
         {
             return numericValue;
         }
 
-        Debug.LogWarning("Unknown card rank: " + card.Rank);
+        Debug.LogWarning("Unknown card rank: " + card.Rank); // warnt bei unbekanntem Kartenrang
         return 0;
     }
 }

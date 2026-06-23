@@ -2,17 +2,35 @@ using UnityEngine;
 
 public class VRMovement : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    public float moveSpeed = 1.2f;
+// =====================================
+// Bewegungseinstellungen
+// =====================================
+
+[Header("Movement Settings")]
+    public float moveSpeed = 1.2f; // Geschwindigkeit der Fortbewegung
+
+    // =====================================
+    // Snap-Turn-Einstellungen
+    // =====================================
 
     [Header("Snap Turn Settings")]
-    public float snapTurnAngle = 45.0f;
-    public float snapTurnCooldown = 0.35f;
+    public float snapTurnAngle = 45.0f; // Winkel pro Drehung
+    public float snapTurnCooldown = 0.35f; // Wartezeit zwischen zwei Snap Turns
+
+
 
     [Header("References")]
-    public Transform centerEyeAnchor;
+    public Transform centerEyeAnchor; // Blickrichtung der VR-Kamera
 
-    private float lastSnapTurnTime = 0f;
+    // =====================================
+    // Interner Drehstatus
+    // =====================================
+
+    private float lastSnapTurnTime = 0f; // Zeitpunkt der letzten Drehung
+
+    // =====================================
+    // Eingaben prüfen
+    // =====================================
 
     void Update()
     {
@@ -25,13 +43,17 @@ public class VRMovement : MonoBehaviour
         HandleSnapTurn();
     }
 
+    // =====================================
+    // Bewegung verarbeiten
+    // =====================================
+
     private void HandleMovement()
     {
         // Linker Stick: Bewegung
         Vector2 moveInput = OVRInput.Get(OVRInput.Axis2D.PrimaryThumbstick);
 
-        Vector3 forward = centerEyeAnchor.forward;
-        Vector3 right = centerEyeAnchor.right;
+        Vector3 forward = centerEyeAnchor.forward; // Vorwärtsrichtung aus Blickrichtung
+        Vector3 right = centerEyeAnchor.right; // Rechtsrichtung aus Blickrichtung
 
         // Nur horizontale Bewegung, keine Bewegung nach oben/unten durch Kopfneigung
         forward.y = 0;
@@ -40,9 +62,13 @@ public class VRMovement : MonoBehaviour
         forward.Normalize();
         right.Normalize();
 
-        Vector3 moveDirection = forward * moveInput.y + right * moveInput.x;
-        transform.position += moveDirection * moveSpeed * Time.deltaTime;
+        Vector3 moveDirection = forward * moveInput.y + right * moveInput.x; // berechnet Bewegungsrichtung
+        transform.position += moveDirection * moveSpeed * Time.deltaTime; // bewegt den Spieler
     }
+
+    // =====================================
+    // Snap Turn verarbeiten
+    // =====================================
 
     private void HandleSnapTurn()
     {
@@ -65,4 +91,6 @@ public class VRMovement : MonoBehaviour
             lastSnapTurnTime = Time.time;
         }
     }
+
+
 }

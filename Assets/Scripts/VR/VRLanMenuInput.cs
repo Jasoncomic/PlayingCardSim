@@ -3,15 +3,24 @@ using UnityEngine;
 
 public class VRLanMenuInput : MonoBehaviour
 {
-    [Header("References")]
-    public LanConnectionManager lanConnectionManager;
-    public TMP_InputField ipInputField;
-    public GameObject menuPanel;
+[Header("References")]
+    public LanConnectionManager lanConnectionManager; // verwaltet Host- und Client-Verbindung im LAN
+    public TMP_InputField ipInputField; // Eingabefeld für Host-IP
+    public GameObject menuPanel; // Menüfenster, das nach Host-Start ausgeblendet wird
+
+    // =====================================
+    // LAN-Einstellungen
+    // =====================================
 
     [Header("LAN Settings")]
-    public string defaultHostIp = "192.168.0.130";
+    public string defaultHostIp = "192.168.0.130"; // Standard-IP für den Host
 
-    private bool actionTriggered;
+    
+    private bool actionTriggered; // verhindert mehrfaches Auslösen von Host oder Join
+
+    // =====================================
+    // Eingaben prüfen
+    // =====================================
 
     private void Update()
     {
@@ -27,7 +36,7 @@ public class VRLanMenuInput : MonoBehaviour
 
             if (lanConnectionManager != null)
             {
-                lanConnectionManager.StartHost();
+                lanConnectionManager.StartHost(); // startet das Spiel als Host
             }
 
             HideMenu();
@@ -40,23 +49,29 @@ public class VRLanMenuInput : MonoBehaviour
 
             if (ipInputField != null)
             {
-                ipInputField.text = defaultHostIp;
+                ipInputField.text = defaultHostIp; // trägt die Standard-Host-IP ein
             }
 
             if (lanConnectionManager != null)
             {
-                lanConnectionManager.JoinHost();
+                lanConnectionManager.JoinHost(); // verbindet sich als Client mit dem Host
             }
 
             //HideMenu();
         }
     }
 
+    // =====================================
+    // Menü ausblenden
+    // =====================================
+
     private void HideMenu()
     {
         if (menuPanel != null)
         {
-            menuPanel.SetActive(false);
+            menuPanel.SetActive(false); // blendet das LAN-Menü aus
         }
     }
+
+
 }

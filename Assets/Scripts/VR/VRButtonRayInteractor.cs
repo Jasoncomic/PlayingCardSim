@@ -2,19 +2,36 @@ using UnityEngine;
 
 public class VRButtonRayInteractor : MonoBehaviour
 {
-    [Header("Controller")]
-    public Transform rightControllerTransform;
+
+[Header("Controller")]
+    public Transform rightControllerTransform; // Transform des rechten Controllers für den Ray
+
+    // ==================================
+    // Raycast-Einstellungen
+    // ================================
 
     [Header("Raycast Settings")]
-    public float maxDistance = 5.0f;
-    public float maxPressDistance = 1.0f;
+    public float maxDistance = 5.0f; // max Raycast-Reichweite
+    public float maxPressDistance = 1.0f; // max Entfernung für Fallback-Buttondruck
+
+    // ==================================
+    // Papier-Fenster schließen
+    // ==================================
 
     [Header("Click Outside Closes Papers")]
-    public GameObject[] closeWhenClickOutside;
+    public GameObject[] closeWhenClickOutside; // offene Paper-Objekte, die bei Klick außerhalb geschlossen werden
 
-    private VRPhysicalButton currentTarget;
-    private RaycastHit currentHit;
-    private bool hasHit;
+    // ====================================
+    // Aktueller Raycast-Zustand
+    // ====================================
+
+    private VRPhysicalButton currentTarget; // aktuell vom Ray getroffener Button
+    private RaycastHit currentHit; // letzter Raycast-Treffer
+    private bool hasHit; // merkt sich, ob der Ray etwas getroffen hat
+
+    // ================================
+    // Eingabe prüfen
+    // ================================
 
     private void Update()
     {
@@ -25,19 +42,23 @@ public class VRButtonRayInteractor : MonoBehaviour
 
         UpdateCurrentTarget();
 
-        if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
+        if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger)) // rechter Trigger drückt aktuellen Buttn
         {
             HandleTriggerPressed();
         }
     }
+
+    // =====================================
+    // Aktuelles Ziel suchen
+    // =====================================
 
     private void UpdateCurrentTarget()
     {
         currentTarget = null;
         hasHit = false;
 
-        Vector3 start = rightControllerTransform.position;
-        Vector3 direction = rightControllerTransform.forward;
+        Vector3 start = rightControllerTransform.position; // Startpunkt des Rays
+        Vector3 direction = rightControllerTransform.forward; // Richtung des Rays
 
         if (Physics.Raycast(
                 start,
@@ -50,24 +71,28 @@ public class VRButtonRayInteractor : MonoBehaviour
             hasHit = true;
             currentHit = hit;
 
-            VRPhysicalButton button = hit.collider.GetComponent<VRPhysicalButton>();
+            VRPhysicalButton button = hit.collider.GetComponent<VRPhysicalButton>(); // sucht Button direkt am Collider
 
             if (button == null)
             {
-                button = hit.collider.GetComponentInParent<VRPhysicalButton>();
+                button = hit.collider.GetComponentInParent<VRPhysicalButton>(); // sucht Button am Parent-Objekt
             }
 
             currentTarget = button;
         }
     }
 
+    // =====================================
+    // Triggerdruck verarbeiten
+    // =====================================
+
     private void HandleTriggerPressed()
     {
-        bool anyPaperOpen = AnyClosablePaperOpen();
+        bool anyPaperOpen = AnyClosablePaperOpen(); // prüft, ob ein Paper offen ist
 
         if (anyPaperOpen)
         {
-            bool clickInsidePaper = IsRayHitInsideAnyOpenPaper();
+            bool clickInsidePaper = IsRayHitInsideAnyOpenPaper(); // prüft, ob der Klick innerhalb eines offenen Papers ist
 
             if (clickInsidePaper)
             {
@@ -93,11 +118,19 @@ public class VRButtonRayInteractor : MonoBehaviour
         PressNearestButtonFallback();
     }
 
+    // =====================================
+    // Aktuellen Button drücken
+    // =====================================
+
     private void PressCurrentTarget()
     {
         currentTarget.PressButton();
         Debug.Log("Ray pressed button: " + currentTarget.gameObject.name);
     }
+
+    // =====================================
+    // Prüfen ob Paper offen ist
+    // =====================================
 
     private bool AnyClosablePaperOpen()
     {
@@ -116,6 +149,10 @@ public class VRButtonRayInteractor : MonoBehaviour
 
         return false;
     }
+
+    // =============================================
+    // Prüfen ob Ray innerhalb eines Papers trifft
+    // =============================================
 
     private bool IsRayHitInsideAnyOpenPaper()
     {
@@ -145,6 +182,10 @@ public class VRButtonRayInteractor : MonoBehaviour
         return false;
     }
 
+    // =================================
+    // Alle offenen Paper schließen
+    // ================================
+
     private void CloseAllClosablePapers()
     {
         if (closeWhenClickOutside == null)
@@ -161,6 +202,10 @@ public class VRButtonRayInteractor : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Nächsten Button als Fallback drücken
+    // =====================================
+
     private void PressNearestButtonFallback()
     {
         VRPhysicalButton[] buttons = FindObjectsByType<VRPhysicalButton>(
@@ -175,7 +220,7 @@ public class VRButtonRayInteractor : MonoBehaviour
             float distance = Vector3.Distance(
                 rightControllerTransform.position,
                 button.transform.position
-            );
+            ); // Entfernung zw Controller und Button
 
             if (distance < nearestDistance)
             {
@@ -190,4 +235,6 @@ public class VRButtonRayInteractor : MonoBehaviour
             Debug.Log("Nearest VR button pressed: " + nearestButton.gameObject.name);
         }
     }
+
+
 }

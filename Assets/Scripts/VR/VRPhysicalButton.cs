@@ -3,147 +3,204 @@ using UnityEngine;
 
 public class VRPhysicalButton : MonoBehaviour
 {
-    public enum ButtonAction
+// =====================================
+// Button-Aktionen
+// =====================================
+
+
+public enum ButtonAction
     {
-        Hit,
-        Stand,
-        NewRound,
+        Hit, // Karte ziehen
+        Stand, 
+        NewRound, 
 
-    HelpToggle,
-        SettingsToggle,
-        MainMenu,
-        Music,
-        ClosePaper,
-        MusicVolumeDown,
-        MusicVolumeUp,
+        HelpToggle, // Hilfe-Paper öffnen/schließen
+        SettingsToggle, 
+        MainMenu, 
+        Music, 
+        ClosePaper, 
+        MusicVolumeDown, 
+        MusicVolumeUp, 
 
-        OpenCreateMenu,
-        JoinGame,
-        SelectOnePlayer,
-        SelectTwoPlayers,
-        SelectThreePlayers,
-        BackToMainMenu,
-        ConfirmCreateGame,
+        OpenCreateMenu, 
+        JoinGame, 
+        SelectOnePlayer, 
+        SelectTwoPlayers, 
+        SelectThreePlayers, 
+        BackToMainMenu, 
+        ConfirmCreateGame, 
 
-        NewGame
+        NewGame 
     }
 
+    // =====================================
+    // Button Action
+    // =====================================
+
     [Header("Button Action")]
-    public ButtonAction action;
+    public ButtonAction action; // Aktion, die dieser Button ausführt
+
+    
 
     [Header("Blackjack")]
-    public NetworkBlackjackTable networkBlackjackTable;
+    public NetworkBlackjackTable networkBlackjackTable; // Referenz zum Netzwerk-Blackjack-Tisch
+
+
 
     [Header("Quest Network Menu")]
-    public StandaloneQuestNetworkInput questNetworkInput;
-    public GameObject mainMenuRoot;
-    public GameObject createGameMenuRoot;
-    public TMP_Text menuStatusText;
+    public StandaloneQuestNetworkInput questNetworkInput; // steuert Host, Join und Spieleranzahl
+    public GameObject mainMenuRoot; // Hauptmenü-Objekt
+    public GameObject createGameMenuRoot; // Create-Game-Menü-Objekt
+    public TMP_Text menuStatusText; // Textanzeige für Menüstatus
+
+    // =====================================
+    // Paper / Menu UI
+    // =====================================
 
     [Header("Paper / Menu UI")]
-    public GameObject helpPaperRoot;
-    public GameObject settingsPaperRoot;
+    public GameObject helpPaperRoot; // Hilfe-Paper
+    public GameObject settingsPaperRoot; // Settings-Paper
+
+    // =====================================
+    // Music
+    // =====================================
 
     [Header("Music")]
-    public VRMusicSettings musicSettings;
-    public AudioSource musicAudioSource;
+    public VRMusicSettings musicSettings; // Musiksteuerung über VRMusicSettings
+    public AudioSource musicAudioSource; // Fallback-AudioSource
 
     [Range(0f, 1f)]
-    public float volumeStep = 0.1f;
+    public float volumeStep = 0.1f; // Schrittgröße für Lautstärkeänderung
+
+    // =====================================
+    // Press Settings
+    // =====================================
 
     [Header("Press Settings")]
-    public Transform visualTarget;
-    public Vector3 pressedLocalOffset = new Vector3(0f, -0.015f, 0f);
-    public float pressDuration = 0.12f;
-    public float cooldown = 0.7f;
+    public Transform visualTarget; // sichtbares Objekt, das beim Drücken bewegt wird
+    public Vector3 pressedLocalOffset = new Vector3(0f, -0.015f, 0f); // lokale Verschiebung beim Drücken
+    public float pressDuration = 0.12f; // Dauer der Druckanimation
+    public float cooldown = 0.7f; // Wartezeit bis zum nächsten Druck
 
-    private Vector3 originalLocalPosition;
-    private bool hasOriginalPosition;
-    private bool isPressed;
-    private float lastPressTime = -999f;
+    // =====================================
+    // Interner Button-Zustand
+    // =====================================
+
+    private Vector3 originalLocalPosition; // ursprüngliche Position des Button-Visuals
+    private bool hasOriginalPosition; // merkt, ob die Originalposition gespeichert wurde
+    private bool isPressed; // verhindert doppelte Druckanimation
+    private float lastPressTime = -999f; // Zeitpunkt des letzten Drückens
+
+    // =====================================
+    // Initialisierung
+    // =====================================
 
     private void Awake()
     {
         if (visualTarget == null)
         {
-            visualTarget = transform;
+            visualTarget = transform; // nutzt eigenes Transform, wenn kein Visual gesetzt ist
         }
 
-        originalLocalPosition = visualTarget.localPosition;
-        hasOriginalPosition = true;
+        originalLocalPosition = visualTarget.localPosition; // speichert Startposition
+        hasOriginalPosition = true; // bestätigt gespeicherte Position
     }
+
+    // =====================================
+    // Physischer Trigger-Kontakt
+    // =====================================
 
     private void OnTriggerEnter(Collider other)
     {
-        TryPress();
+        TryPress(); // versucht Buttondruck auszulösen
     }
+
+    // =====================================
+    // Button drücken
+    // =====================================
 
     public void Press()
     {
-        TryPress();
+        TryPress(); // externe Press-Funktion
     }
 
     public void PressButton()
     {
-        TryPress();
+        TryPress(); // Press-Funktion für Ray/Button-Systeme
     }
 
     public void TriggerButton()
     {
-        TryPress();
+        TryPress(); // alternative Trigger-Funktion
     }
+
+    // =====================================
+    // Buttondruck prüfen
+    // =====================================
 
     private void TryPress()
     {
-        if (Time.time - lastPressTime < cooldown)
+        if (Time.time - lastPressTime < cooldown) // verhindert zu schnelles mehrfaches Drücken
         {
             return;
         }
 
-        lastPressTime = Time.time;
+        lastPressTime = Time.time; 
 
-        PlayPressAnimation();
-        ExecuteAction();
+        PlayPressAnimation(); // startet visuelle Druckanimation
+        ExecuteAction(); // führt ausgewählte Aktion aus
     }
+
+    // =====================================
+    // Druckanimation starten
+    // =====================================
 
     private void PlayPressAnimation()
     {
-        if (!gameObject.activeInHierarchy)
+        if (!gameObject.activeInHierarchy) // keine Animation, wenn Objekt inaktiv ist
         {
             return;
         }
 
-        StopAllCoroutines();
-        StartCoroutine(PressAnimationRoutine());
+        StopAllCoroutines(); 
+        StartCoroutine(PressAnimationRoutine()); 
     }
+
+    // =====================================
+    // Druckanimation ausführen
+    // =====================================
 
     private System.Collections.IEnumerator PressAnimationRoutine()
     {
-        if (visualTarget == null)
+        if (visualTarget == null) // bricht ab, wenn kein Visual vorhanden ist
         {
             yield break;
         }
 
-        if (!hasOriginalPosition)
+        if (!hasOriginalPosition) // speichert Position nach, falls nötig
         {
             originalLocalPosition = visualTarget.localPosition;
             hasOriginalPosition = true;
         }
 
-        if (isPressed)
+        if (isPressed) // verhindert doppelte Animation
         {
             yield break;
         }
 
-        isPressed = true;
+        isPressed = true; // markiert Button als gedrückt
 
-        visualTarget.localPosition = originalLocalPosition + pressedLocalOffset;
+        visualTarget.localPosition = originalLocalPosition + pressedLocalOffset; // bewegt Button nach unten
 
-        yield return new WaitForSeconds(pressDuration);
+        yield return new WaitForSeconds(pressDuration); // wartet kurz in gedrückter Position
 
-        visualTarget.localPosition = originalLocalPosition;
-        isPressed = false;
+        visualTarget.localPosition = originalLocalPosition; // setzt Button zurück
+        isPressed = false; // gibt Button wieder frei
     }
+
+    // =====================================
+    // Ausgewählte Aktion ausführen
+    // =====================================
 
     private void ExecuteAction()
     {
@@ -152,100 +209,104 @@ public class VRPhysicalButton : MonoBehaviour
             case ButtonAction.Hit:
                 if (networkBlackjackTable != null)
                 {
-                    networkBlackjackTable.HitButton();
+                    networkBlackjackTable.HitButton(); // Karte ziehen
                 }
                 break;
 
             case ButtonAction.Stand:
                 if (networkBlackjackTable != null)
                 {
-                    networkBlackjackTable.StandButton();
+                    networkBlackjackTable.StandButton(); // Zug beenden
                 }
                 break;
 
             case ButtonAction.NewRound:
                 if (networkBlackjackTable != null)
                 {
-                    networkBlackjackTable.StartRoundButton();
+                    networkBlackjackTable.StartRoundButton(); // neue Runde starten
                 }
                 break;
 
             case ButtonAction.NewGame:
                 if (networkBlackjackTable != null)
                 {
-                    networkBlackjackTable.NewGameButton();
+                    networkBlackjackTable.NewGameButton(); // komplett neues Spiel starten
                 }
                 break;
 
             case ButtonAction.HelpToggle:
-                ToggleObject(helpPaperRoot);
+                ToggleObject(helpPaperRoot); // Hilfe-Paper umschalten
                 break;
 
             case ButtonAction.SettingsToggle:
-                ToggleObject(settingsPaperRoot);
+                ToggleObject(settingsPaperRoot); // Settings-Paper umschalten
                 break;
 
             case ButtonAction.MainMenu:
-                ShowMainMenu();
+                ShowMainMenu(); 
                 break;
 
             case ButtonAction.Music:
-                ToggleMusic();
+                ToggleMusic(); // Musik an/aus schalten
                 break;
 
             case ButtonAction.ClosePaper:
-                ClosePapers();
+                ClosePapers(); // offene Paper schließen
                 break;
 
             case ButtonAction.MusicVolumeDown:
-                ChangeMusicVolume(-volumeStep);
+                ChangeMusicVolume(-volumeStep); 
                 break;
 
             case ButtonAction.MusicVolumeUp:
-                ChangeMusicVolume(volumeStep);
+                ChangeMusicVolume(volumeStep); 
                 break;
 
             case ButtonAction.OpenCreateMenu:
-                ShowCreateGameMenu();
+                ShowCreateGameMenu(); // Create-Game-Menü öffnen
                 break;
 
             case ButtonAction.JoinGame:
-                JoinGame();
+                JoinGame(); 
                 break;
 
             case ButtonAction.SelectOnePlayer:
-                SelectPlayerCount(1);
+                SelectPlayerCount(1); 
                 break;
 
             case ButtonAction.SelectTwoPlayers:
-                SelectPlayerCount(2);
+                SelectPlayerCount(2); 
                 break;
 
             case ButtonAction.SelectThreePlayers:
-                SelectPlayerCount(3);
+                SelectPlayerCount(3); 
                 break;
 
             case ButtonAction.BackToMainMenu:
-                ShowMainMenu();
+                ShowMainMenu(); // zurück ins Hauptmenü
                 break;
 
             case ButtonAction.ConfirmCreateGame:
-                ConfirmCreateGame();
+                ConfirmCreateGame(); 
                 break;
         }
     }
+
+    // =====================================
+    // Musik an- und ausschalten
+    // =====================================
 
     private void ToggleMusic()
     {
         if (musicSettings != null)
         {
-            musicSettings.ToggleMusic();
+            musicSettings.ToggleMusic(); // nutzt VRMusicSettings, wenn zugewiesen
             return;
         }
 
         if (musicAudioSource != null)
         {
-            musicAudioSource.mute = !musicAudioSource.mute;
+            musicAudioSource.mute = !musicAudioSource.mute; // Fallback: AudioSource stumm schalten
         }
         else
         {
@@ -253,17 +314,21 @@ public class VRPhysicalButton : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Musiklautstärke ändern
+    // =====================================
+
     private void ChangeMusicVolume(float amount)
     {
         if (musicSettings != null)
         {
             if (amount > 0f)
             {
-                musicSettings.IncreaseMusicVolume();
+                musicSettings.IncreaseMusicVolume(); // erhöht Lautstärke über VRMusicSettings
             }
             else
             {
-                musicSettings.DecreaseMusicVolume();
+                musicSettings.DecreaseMusicVolume(); // verringert Lautstärke über VRMusicSettings
             }
 
             return;
@@ -271,7 +336,7 @@ public class VRPhysicalButton : MonoBehaviour
 
         if (musicAudioSource != null)
         {
-            musicAudioSource.volume = Mathf.Clamp01(musicAudioSource.volume + amount);
+            musicAudioSource.volume = Mathf.Clamp01(musicAudioSource.volume + amount); // Fallback-Lautstärke begrenzt ändern
         }
         else
         {
@@ -279,42 +344,54 @@ public class VRPhysicalButton : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Create-Game-Menü anzeigen
+    // =====================================
+
     private void ShowCreateGameMenu()
     {
         if (mainMenuRoot != null)
         {
-            mainMenuRoot.SetActive(false);
+            mainMenuRoot.SetActive(false); // Hauptmenü ausblenden
         }
 
         if (createGameMenuRoot != null)
         {
-            createGameMenuRoot.SetActive(true);
+            createGameMenuRoot.SetActive(true); // Create-Menü einblenden
         }
 
         if (questNetworkInput != null)
         {
-            SetMenuStatus("Selected Players: " + questNetworkInput.selectedPlayerCount);
+            SetMenuStatus("Selected Players: " + questNetworkInput.selectedPlayerCount); // zeigt aktuelle Spieleranzahl
         }
         else
         {
-            SetMenuStatus("Select player count.");
+            SetMenuStatus("Select player count."); // Fallback-Text
         }
     }
+
+    // =====================================
+    // Hauptmenü anzeigen
+    // =====================================
 
     private void ShowMainMenu()
     {
         if (mainMenuRoot != null)
         {
-            mainMenuRoot.SetActive(true);
+            mainMenuRoot.SetActive(true); // Hauptmenü einblenden
         }
 
         if (createGameMenuRoot != null)
         {
-            createGameMenuRoot.SetActive(false);
+            createGameMenuRoot.SetActive(false); // Create-Menü ausblenden
         }
 
-        SetMenuStatus("Create Game or Join Game");
+        SetMenuStatus("Create Game or Join Game"); // setzt Hauptmenü-Status
     }
+
+    // =====================================
+    // Spieleranzahl auswählen
+    // =====================================
 
     private void SelectPlayerCount(int playerCount)
     {
@@ -324,10 +401,14 @@ public class VRPhysicalButton : MonoBehaviour
             return;
         }
 
-        questNetworkInput.selectedPlayerCount = Mathf.Clamp(playerCount, 1, 3);
+        questNetworkInput.selectedPlayerCount = Mathf.Clamp(playerCount, 1, 3); // begrenzt Spieleranzahl auf 1 bis 3
 
-        SetMenuStatus("Selected Players: " + questNetworkInput.selectedPlayerCount);
+        SetMenuStatus("Selected Players: " + questNetworkInput.selectedPlayerCount); // zeigt gewählte Spieleranzahl
     }
+
+    // =====================================
+    // Create Game bestätigen
+    // =====================================
 
     private void ConfirmCreateGame()
     {
@@ -341,10 +422,14 @@ public class VRPhysicalButton : MonoBehaviour
             "Creating game with " +
             questNetworkInput.selectedPlayerCount +
             " player(s)..."
-        );
+        ); // zeigt Host-Erstellung im Menü an
 
-        questNetworkInput.StartQuestHost();
+        questNetworkInput.StartQuestHost(); // startet die Quest als Host
     }
+
+    // =====================================
+    // Spiel beitreten
+    // =====================================
 
     private void JoinGame()
     {
@@ -354,36 +439,44 @@ public class VRPhysicalButton : MonoBehaviour
             return;
         }
 
-        SetMenuStatus("Joining game...");
+        SetMenuStatus("Joining game..."); // zeigt Join-Status
 
-        questNetworkInput.JoinQuestHost();
+        questNetworkInput.JoinQuestHost(); // verbindet sich als Client
 
         if (mainMenuRoot != null)
         {
-            mainMenuRoot.SetActive(false);
+            mainMenuRoot.SetActive(false); // Hauptmenü ausblenden
         }
 
         if (createGameMenuRoot != null)
         {
-            createGameMenuRoot.SetActive(false);
+            createGameMenuRoot.SetActive(false); // Create-Menü ausblenden
         }
     }
+
+    // =====================================
+    // Menüstatus setzen
+    // =====================================
 
     private void SetMenuStatus(string message)
     {
-        Debug.Log(message);
+        Debug.Log(message); // schreibt Menüstatus in Console
 
         if (menuStatusText != null)
         {
-            menuStatusText.text = message;
+            menuStatusText.text = message; // schreibt Menüstatus in UI
         }
     }
+
+    // =====================================
+    // Objekt ein- und ausschalten
+    // =====================================
 
     private void ToggleObject(GameObject target)
     {
         if (target != null)
         {
-            target.SetActive(!target.activeSelf);
+            target.SetActive(!target.activeSelf); // schaltet Zielobjekt um
         }
         else
         {
@@ -391,17 +484,22 @@ public class VRPhysicalButton : MonoBehaviour
         }
     }
 
+    // =====================================
+    // Paper schließen
+    // =====================================
+
     private void ClosePapers()
     {
         if (helpPaperRoot != null)
         {
-            helpPaperRoot.SetActive(false);
+            helpPaperRoot.SetActive(false); // Hilfe-Paper schließen
         }
 
         if (settingsPaperRoot != null)
         {
-            settingsPaperRoot.SetActive(false);
+            settingsPaperRoot.SetActive(false); // Settings-Paper schließen
         }
     }
+
 
 }
